@@ -2,7 +2,7 @@ require 'socket'
 require 'openssl'
 require 'resque'
 
-module ApplePushNotification
+module APN
   # Subclass of Resque::Worker which initializes a single TCP socket on creation to communicate with Apple's Push Notification servers.
   # Shares this socket with each child process forked off by Resque to complete a job. Socket is closed in the before_unregister_worker
   # callback, which gets called on normal or exceptional exits.
@@ -12,7 +12,7 @@ module ApplePushNotification
   #
   # Accepts <code>:environment</code> (production vs anything else) and <code>:cert_path</code> options on initialization.  If called in a 
   # Rails context, will default to RAILS_ENV and RAILS_ROOT/config/certs. :environment will default to development.  
-  # ApplePushNotification::Sender expects two files to exist in the specified <code>:cert_path</code> directory: 
+  # APN::Sender expects two files to exist in the specified <code>:cert_path</code> directory: 
   # <code>apn_production.pem</code> and <code>apn_development.pem</code>.
   class Sender < ::Resque::Worker
     APN_PORT = 2195
@@ -35,14 +35,14 @@ module ApplePushNotification
       @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
       @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
       
-      logger.info "ApplePushNotification::Sender initializing. Establishing connections first..." if @opts[:verbose]
+      logger.info "APN::Sender initializing. Establishing connections first..." if @opts[:verbose]
       setup_paths
       setup_connection
       
-      super( ApplePushNotification::QUEUE_NAME )
+      super( APN::QUEUE_NAME )
     end
         
-    # Send a raw string over the socket to Apple's servers (presumably already formatted by ApplePushNotification::Message)
+    # Send a raw string over the socket to Apple's servers (presumably already formatted by APN::Notification)
     def send_to_apple(msg)
       @socket.write( msg.to_s )
     rescue SocketError => error
@@ -112,7 +112,7 @@ __END__
 # irb -r 'lib/apple_push_notification'
 
 ## To enqueue test job
-Resque.enqueue ApplePushNotification::MessageJob, 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', {:alert => 'Resque Test'}
+Resque.enqueue APN::NotificationJob, 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', {:alert => 'Resque Test'}
 
 
 ## To run worker from rake task
@@ -121,12 +121,12 @@ CERT_PATH=/Users/kali/Code/insurrection/certs/ ENVIRONMENT=production rake apn:w
 ## To run worker from IRB 
 Resque.workers.map(&:unregister_worker)
 require 'ruby-debug'
-worker = ApplePushNotification::Sender.new(:cert_path => '/Users/kali/Code/insurrection/certs/', :environment => :production)
+worker = APN::Sender.new(:cert_path => '/Users/kali/Code/insurrection/certs/', :environment => :production)
 worker.very_verbose = true
 worker.work(5)
 
 ## To run worker as daemon - NOT YET TESTED
-ApplePushNotification::SenderDaemon.new(ARGV).daemonize
+APN::SenderDaemon.new(ARGV).daemonize
 
 ## TESTING - check the broken pipe errors
 

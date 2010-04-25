@@ -1,10 +1,10 @@
-= ApplePushNotification
+= apn_sender
 
-So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that the APN servers may treat non-persistent connections as a Denial of Service attack, and things started looking more complicated.
+So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that the Apple's servers may treat non-persistent connections as a Denial of Service attack, and things started looking more complicated.
 
 If this doesn't sound familiar, this gem probably isn't anything you need.  If it does, though...
 
-The ApplePushNotification gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes helper methods for enqueueing your jobs and a sample monit config to make sure the background worker is around when you need it.
+The apn_sender gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes helper methods for enqueueing your jobs and a sample monit config to make sure the background worker is around when you need it.
 
 
 == Usage
@@ -13,13 +13,14 @@ The ApplePushNotification gem includes a background daemon which processes backg
 
 To queue a message for sending through Apple's Push Notification service from your Rails application:
 
-  ApplePushNotification.send_message(token, opts_hash)
+  APN.notify(token, opts_hash)
   
-where +token+ is the unique identifier of the iPhone to receive the message and +opts_hash+ can have any of the following keys:
+where +token+ is the unique identifier of the iPhone to receive the notification and +opts_hash+ can have any of the following keys:
 
-  # :alert #=> The alert to send
-  # :badge #=> The badge number to send
-  # :sound #=> The sound file to play on receipt, or true to play the default sound installed with your app
+  # :alert  #=> The alert to send
+  # :badge  #=> The badge number to send
+  # :sound  #=> The sound file to play on receipt, or true to play the default sound installed with your app
+  # :custom #=> Hash of application-specific custom data to send along with the notification
 
 === Getting Messages Actually Sent to Apple
 
@@ -46,7 +47,7 @@ There's also an included sample <code>apn_sender.monitrc</code> file in the <cod
 
 == Installation
 
-ApplePushNotification is built on top of {Resque}[http://github.com/defunkt/resque] (an awesome {Redis}[http://code.google.com/p/redis/]-based background runner similar to {delayed_job}[http://github.com/collectiveidea/delayed_job]). Read through the {Resque README}[http://github.com/defunkt/resque#readme] to get a feel for what's going on, follow the installation instructions there, and then run:
+APN is built on top of {Resque}[http://github.com/defunkt/resque] (an awesome {Redis}[http://code.google.com/p/redis/]-based background runner similar to {delayed_job}[http://github.com/collectiveidea/delayed_job]). Read through the {Resque README}[http://github.com/defunkt/resque#readme] to get a feel for what's going on, follow the installation instructions there, and then run:
 
   $ sudo gem install apple_push_notification
 

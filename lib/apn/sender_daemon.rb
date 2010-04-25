@@ -3,7 +3,7 @@ require 'rubygems'
 require 'daemons'
 require 'optparse'
 
-module ApplePushNotification
+module APN
   class SenderDaemon
     attr_accessor :worker_count
     
@@ -49,9 +49,9 @@ module ApplePushNotification
       logger.level = ActiveRecord::Base.logger.level
       ActiveRecord::Base.logger = logger
       ActiveRecord::Base.clear_active_connections!
-      ApplePushNotification::Sender.logger = logger
+      APN::Sender.logger = logger
       
-      worker = ApplePushNotification::Sender.new(@options)
+      worker = APN::Sender.new(@options)
       worker.verbose = @options[:verbose]
       worker.very_verbose = @options[:very_verbose]
       worker.work(@options[:delay] || 5)

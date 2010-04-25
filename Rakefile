@@ -1,14 +1,14 @@
 require 'rubygems'
 require 'rake'
 
-load 'lib/apple_push_notification/tasks.rb'
+load 'lib/apn/tasks.rb'
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "apple_push_notification"
+    gem.name = "apn_sender"
     gem.summary = %Q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket.}
-    gem.description = %Q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN messages, and a background daemon to send them.}
+    gem.description = %Q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them.}
     gem.email = "kali.donovan@gmail.com"
     gem.homepage = "http://github.com/kdonovan/apple_push_notification"
     gem.authors = ["Kali Donovan"]

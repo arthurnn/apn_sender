@@ -4,4 +4,4 @@
 RAILS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 require File.join(File.dirname(__FILE__), *%w(.. vendor plugins apple_push_notification lib apple_push_notification sender_daemon))
-ApplePushNotification::SenderDaemon.new(ARGV).daemonize
+APN::SenderDaemon.new(ARGV).daemonize

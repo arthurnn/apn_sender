@@ -14,11 +14,11 @@ module Resque
     
     
     # Unforunately have to override Resque::Worker's +run_hook+ method to call hook on 
-    # ApplePushNotification::QueueManager rather on Resque directly. Any suggestions on
+    # APN::QueueManager rather on Resque directly. Any suggestions on
     # how to make this more flexible are more than welcome.
     def run_hook(name, *args)
       # return unless hook = Resque.send(name)
-      return unless hook = ApplePushNotification::QueueManager.send(name)
+      return unless hook = APN::QueueManager.send(name)
       msg = "Running #{name} hook"
       msg << " with #{args.inspect}" if args.any?
       log msg

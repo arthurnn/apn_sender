@@ -4,14 +4,14 @@ namespace :apn do
   task :sender => :work
   task :senders => :workers  
 
-  desc "Start an ApplePushNotification worker"
+  desc "Start an APN worker"
   task :work => :setup do
     require 'lib/apple_push_notification'
 
     worker = nil
 
     begin
-      worker = ApplePushNotification::Sender.new(:cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'])
+      worker = APN::Sender.new(:cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'])
       worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
       worker.very_verbose = ENV['VVERBOSE']
     rescue Exception => e

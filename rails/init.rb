@@ -1,1 +1,1 @@
-require "apple_push_notification"
+require "apn"

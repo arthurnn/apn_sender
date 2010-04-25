@@ -2,7 +2,7 @@
 # monkeypatch in the Resque::Worker class. See +resque/hooks/before_unregister_worker.rb+ for an
 # example implementation
 
-module ApplePushNotification
+module APN
   # Extends Resque, allowing us to add all the callbacks to Resque we desire without affecting the expected
   # functionality in the parent app, if we're included in e.g. a Rails application.
   class QueueManager
@@ -17,21 +17,21 @@ module ApplePushNotification
     end
 
     def self.to_s
-      "ApplePushNotification::QueueManager (Resque Client) connected to #{redis.server}"
+      "APN::QueueManager (Resque Client) connected to #{redis.server}"
     end
   end
   
 end
 
 # Ensures we close any open sockets when the worker exits
-ApplePushNotification::QueueManager.before_unregister_worker do |worker|
+APN::QueueManager.before_unregister_worker do |worker|
   worker.send(:teardown_connection) if worker.respond_to?(:teardown_connection)
 end
 
 
-# # Run N jobs per fork, rather than creating a new fork for each message
+# # Run N jobs per fork, rather than creating a new fork for each notification
 # # By defunkt - http://gist.github.com/349376
-# ApplePushNotification::QueueManager.after_fork do |job|
+# APN::QueueManager.after_fork do |job|
 #   # How many jobs should we process in each fork?
 #   jobs_per_fork = 10
 # 
