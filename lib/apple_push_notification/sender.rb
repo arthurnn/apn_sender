@@ -8,11 +8,12 @@ module ApplePushNotification
   # callback, which gets called on normal or exceptional exits.
   #
   # End result: single persistent TCP connection to Apple, so they don't ban you for frequently opening and closing connections,
-  # which they apparently view as "spammy".
+  # which they apparently view as a DOS attack.
   #
-  # Accepts :environment (production vs anything else) and :cert_path options on initialization.  If called in a Rails context 
-  # will default to RAILS_ENV and RAILS_ROOT/config/certs. :environment will default to development.  ApplePushNotification::Sender
-  # expects two files to exist in the specified :cert_path directory: apn_production.pem and apn_development.pem.
+  # Accepts <code>:environment</code> (production vs anything else) and <code>:cert_path</code> options on initialization.  If called in a 
+  # Rails context, will default to RAILS_ENV and RAILS_ROOT/config/certs. :environment will default to development.  
+  # ApplePushNotification::Sender expects two files to exist in the specified <code>:cert_path</code> directory: 
+  # <code>apn_production.pem</code> and <code>apn_development.pem</code>.
   class Sender < ::Resque::Worker
     APN_PORT = 2195
     attr_accessor :apn_cert, :apn_host, :socket, :socket_tcp, :opts
@@ -26,10 +27,10 @@ module ApplePushNotification
     elsif defined?(RAILS_DEFAULT_LOGGER)
       RAILS_DEFAULT_LOGGER
     end
-    
+
     def initialize(opts = {})
       @opts = opts
-      
+
       # Set option defaults
       @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
       @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
@@ -43,7 +44,7 @@ module ApplePushNotification
         
     # Send a raw string over the socket to Apple's servers (presumably already formatted by ApplePushNotification::Message)
     def send_to_apple(msg)
-      @socket.write( msg )
+      @socket.write( msg.to_s )
     rescue SocketError => error
       logger.error("Error with connection to #{@apn_host}: #{error}")
       raise "Error with connection to #{@apn_host}: #{error}"
@@ -62,7 +63,7 @@ module ApplePushNotification
       cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
       cert_path = File.join(@opts[:cert_path], cert_name)
 
-      @apn_cert = File.exists?(cert_name) ? File.read(cert_name) : nil
+      @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
       raise "Missing apple push notification certificate in #{cert_path}" unless @apn_cert
     end
 
@@ -72,8 +73,8 @@ module ApplePushNotification
       raise "Trying to open already-open socket" if @socket || @socket_tcp
       
       ctx = OpenSSL::SSL::SSLContext.new
-      ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
       ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
+      ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
 
       @socket_tcp = TCPSocket.new(@apn_host, APN_PORT)
       @socket = OpenSSL::SSL::SSLSocket.new(@socket_tcp, ctx)
@@ -87,8 +88,18 @@ module ApplePushNotification
     # Close open sockets
     def teardown_connection
       logger.info "Closing connections..." if @opts[:verbose]
-      @socket.close if @socket
-      @socket_tcp.close if @socket_tcp
+
+      begin
+        @socket.close if @socket
+      rescue Exception => e
+        logger.error("Error closing SSL Socket: #{e}")
+      end
+      
+      begin
+        @socket_tcp.close if @socket_tcp
+      rescue Exception => e
+        logger.error("Error closing TCP Socket: #{e}")
+      end
     end
     
   end
@@ -98,10 +109,25 @@ end
 
 __END__
 
-# nc -l -p 1234 localhost
+# irb -r 'lib/apple_push_notification'
 
+## To enqueue test job
+Resque.enqueue ApplePushNotification::MessageJob, 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', {:alert => 'Resque Test'}
+
+
+## To run worker from rake task
+CERT_PATH=/Users/kali/Code/insurrection/certs/ ENVIRONMENT=production rake apn:work
+
+## To run worker from IRB 
 Resque.workers.map(&:unregister_worker)
 require 'ruby-debug'
-worker = ApplePushNotification::Sender.new(:cert_path => './certs/')
+worker = ApplePushNotification::Sender.new(:cert_path => '/Users/kali/Code/insurrection/certs/', :environment => :production)
 worker.very_verbose = true
 worker.work(5)
+
+## To run worker as daemon - NOT YET TESTED
+ApplePushNotification::SenderDaemon.new(ARGV).daemonize
+
+## TESTING - check the broken pipe errors
+
+## TESTING - then check implementation of resque-web

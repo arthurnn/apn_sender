@@ -1,6 +1,6 @@
 = ApplePushNotification
 
-So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that the APN servers may treat non-persistent connections as spammy and shut you down, and things started looking more complicated.
+So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that the APN servers may treat non-persistent connections as a Denial of Service attack, and things started looking more complicated.
 
 If this doesn't sound familiar, this gem probably isn't anything you need.  If it does, though...
 
@@ -9,7 +9,7 @@ The ApplePushNotification gem includes a background daemon which processes backg
 
 == Usage
 
-=== Sending Messages From Your Application
+=== Queueing Messages From Your Application
 
 To queue a message for sending through Apple's Push Notification service from your Rails application:
 
@@ -21,7 +21,7 @@ where +token+ is the unique identifier of the iPhone to receive the message and 
   # :badge #=> The badge number to send
   # :sound #=> The sound file to play on receipt, or true to play the default sound installed with your app
 
-=== Getting Messages Actually Sent
+=== Getting Messages Actually Sent to Apple
 
 Put your <code>apn_development.pem</code> and <code>apn_production.pem</code> certificates from Apple in your <code>RAILS_ROOT/config/certs</code> directory.
 
@@ -41,7 +41,8 @@ Note the --environment must be explicitly set (separately from your <code>RAILS_
 
 === Keeping Your Workers Working
 
-We've also included a sample <code>apn_sender.monitrc</code> file in the <code>contrib/</code> folder to help monit handle server restarts and unexpected disasters.
+There's also an included sample <code>apn_sender.monitrc</code> file in the <code>contrib/</code> folder to help monit handle server restarts and unexpected disasters.
+
 
 == Installation
 

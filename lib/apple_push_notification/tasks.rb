@@ -9,10 +9,9 @@ namespace :apn do
     require 'lib/apple_push_notification'
 
     worker = nil
-    queues = ApplePushNotification::QUEUE_NAME
 
     begin
-      worker = Resque::Worker.new(queues)
+      worker = ApplePushNotification::Sender.new(:cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'])
       worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
       worker.very_verbose = ENV['VVERBOSE']
     rescue Exception => e

@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'resque'
 require 'resque/plugins/access_worker_from_job'
-require File.dirname(__FILE__) + '/resque/hooks/before_unregister_worker'
+require 'resque/hooks/before_unregister_worker'
 
 begin
   require 'yajl/json_gem'
