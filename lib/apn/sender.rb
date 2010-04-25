@@ -113,7 +113,7 @@ __END__
 
 ## To enqueue test job
 Resque.enqueue APN::NotificationJob, 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', {:alert => 'Resque Test'}
-
+APN.notify 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', 'Resque Test'
 
 ## To run worker from rake task
 CERT_PATH=/Users/kali/Code/insurrection/certs/ ENVIRONMENT=production rake apn:work

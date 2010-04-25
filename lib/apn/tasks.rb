@@ -1,11 +1,11 @@
 # Slight modifications from the default Resque tasks
 namespace :apn do
   task :setup
-  task :sender => :work
-  task :senders => :workers  
+  task :work => :sender
+  task :workers => :senders
 
   desc "Start an APN worker"
-  task :work => :setup do
+  task :sender => :setup do
     require 'lib/apple_push_notification'
 
     worker = nil
@@ -25,7 +25,7 @@ namespace :apn do
   end
 
   desc "Start multiple APN workers. Should only be used in dev mode."
-  task :workers do
+  task :senders do
     threads = []
 
     ENV['COUNT'].to_i.times do
