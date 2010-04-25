@@ -6,7 +6,7 @@ namespace :apn do
 
   desc "Start an APN worker"
   task :sender => :setup do
-    require 'lib/apple_push_notification'
+    require 'apn'
 
     worker = nil
 
