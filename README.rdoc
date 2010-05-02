@@ -9,7 +9,7 @@ The apn_sender gem includes a background daemon which processes background messa
 
 == Usage
 
-=== Queueing Messages From Your Application
+=== 1. Queueing Messages From Your Application
 
 To queue a message for sending through Apple's Push Notification service from your Rails application:
 
@@ -22,7 +22,7 @@ where +token+ is the unique identifier of the iPhone to receive the notification
   # :sound  #=> The sound file to play on receipt, or true to play the default sound installed with your app
   # :custom #=> Hash of application-specific custom data to send along with the notification
 
-=== Getting Messages Actually Sent to Apple
+=== 2. Sending Queued Messages
 
 Put your <code>apn_development.pem</code> and <code>apn_production.pem</code> certificates from Apple in your <code>RAILS_ROOT/config/certs</code> directory.
 
@@ -39,6 +39,43 @@ For production, you're probably better off running a dedicated daemon and settin
   ./script/apn_sender -- --cert-path=PATH_TO_NONSTANDARD_FOLDER_WITH_PEM_FILES --environment=production
 
 Note the --environment must be explicitly set (separately from your <code>RAILS_ENV</code>) to production in order to send messages via the production APN servers.  Any other environment sends messages through Apple's sandbox servers at <code>gateway.sandbox.push.apple.com</code>.
+
+=== 3. Checking Apple's Feedback Service
+  
+Since push notifications are a fire-and-forget sorta deal, where you get no indication if your message was received (or if the specified recipient even exists), Apple needed to come up with some other way to ensure their network isn't clogged with thousands of bogus messages (e.g. from developers sending messages to phones where their application <em>used</em> to be installed, but where the user has since removed it).  Hence, the Feedback Service.
+
+It's actually really simple - you connect to them periodically and they give you a big dump of tokens you shouldn't send to anymore.  The gem wraps this up nicely -- just call:
+
+  # APN::Feedback accepts the same optional :environment and :cert_path options as APN::Sender
+  feedback = APN::Feedback.new()
+
+  tokens = feedback.tokens # => Array of device tokens
+  tokens.each do |token|
+    # ... custom logic here to stop you app from
+    # sending further notifications to this token
+  end
+  
+If you're interested in knowing exactly <em>when</em> Apple determined each token was expired (which can be useful in determining if the application re-registered with your service since it first appeared in the expired queue):
+
+  items = feedback.data # => Array of APN::FeedbackItem elements
+  items.each do |item|
+    item.token
+    item.timestamp
+    # ... custom logic here
+  end
+
+The Feedback Service works as a big queue, and when you connect it pops off all its data and sends it over the wire.  This means that connecting a second time will return an empty array.  For ease of use, a call to either +tokens+ or +data+ will connect once and cache the data, so if you call either one again it'll continue to use its cached version rather than connecting to Apple a second time to retrieve an empty array.
+
+Forcing a reconnect is as easy as calling either method with the single parameter +true+, but be sure you've already used the existing data because you'll never get it back.
+
+
+==== Warning: No really, check Apple's Feedback Service occasionally
+
+If you're sending notifications, you should definitely call one of the <code>receive</code> methods periodically, as Apple's policies require it and they apparently monitors providers for compliance.  I'd definitely recommend throwing together a quick rake task to take care of this for you (the {whenever library}[http://github.com/javan/whenever] provides a nice wrapper around scheduling tasks to run at certain times (for systems with cron enabled)).
+
+
+
+
 
 === Keeping Your Workers Working
 

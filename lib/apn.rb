@@ -22,4 +22,6 @@ end
 
 require 'apn/notification'
 require 'apn/notification_job'
+require 'apn/connection/base'
 require 'apn/sender'
+require 'apn/feedback'

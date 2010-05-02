@@ -18,28 +18,40 @@ module APN
   #   APN::Notification.new(token, {:alert => 'Some Alert'})
   #
   class Notification
-    attr_accessor :message, :options, :json
+    attr_accessor :options, :token
     def initialize(token, opts)
       @options = hash_as_symbols(opts.is_a?(Hash) ? opts : {:alert => opts})
-      @json = generate_apple_json
-      hex_token = [token.delete(' ')].pack('H*')
-      @message = "\0\0 #{hex_token}\0#{json.length.chr}#{json}"
-      raise "The maximum size allowed for a notification payload is 256 bytes." if @message.size.to_i > 256
+      @token = token
+
+      raise "The maximum size allowed for a notification payload is 256 bytes." if packaged_notification.size.to_i > 256
     end
 
     def to_s
-      @message      
+      packaged_notification
     end
     
+    # Ensures at least one of <code>%w(alert badge sound)</code> is present
     def valid?
       return true if %w(alert badge sound).any?{|key| options.keys.include?(key.to_sym) }
       false
     end
     
     protected
-    
+
+    # Completed encoded notification, ready to send down the wire to Apple
+    def packaged_notification
+      pt = packaged_token
+      pm = packaged_message
+      [0, 0, 32, pt, 0, pm.size, pm].pack("ccca*cca*") 
+    end
+
+    # Device token, compressed and hex-ified
+    def packaged_token
+      [@token.gsub(/[\s|<|>]/,'')].pack('H*')
+    end
+
     # Convert the supplied options into the JSON needed for Apple's push notification servers
-    def generate_apple_json
+    def packaged_message
       hsh = {'aps' => {}}
       hsh['aps']['alert'] = @options[:alert].to_s if @options[:alert]
       hsh['aps']['badge'] = @options[:badge].to_i if @options[:badge]
@@ -48,7 +60,7 @@ module APN
       hsh.merge!(@options[:custom]) if @options[:custom]
       hsh.to_json
     end
-
+    
     # Symbolize keys, using ActiveSupport if available
     def hash_as_symbols(hash)
       if hash.respond_to?(:symbolize_keys)
