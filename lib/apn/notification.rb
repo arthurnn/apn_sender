@@ -18,6 +18,11 @@ module APN
   #   APN::Notification.new(token, {:alert => 'Some Alert'})
   #
   class Notification
+    # Available to help clients determine before they create the notification if their message will be too large.
+    # Each iPhone Notification payload must be 256 or fewer characters.  Encoding a null message has a 57 
+    # character overhead, so there are 199 characters available for the alert string.
+    MAX_ALERT_LENGTH = 199 
+    
     attr_accessor :options, :token
     def initialize(token, opts)
       @options = hash_as_symbols(opts.is_a?(Hash) ? opts : {:alert => opts})
