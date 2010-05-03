@@ -5,11 +5,11 @@ module APN
   #
   # APN::Notification.new's first argument is the token of the iPhone which should receive the notification.  The second argument
   # is a hash with any of :alert, :badge, and :sound keys. All three accept string arguments, while :sound can also be set to +true+
-  # to play the default sound installed with the application. At least one of these keys must exist. The hash also accepts a
-  # :custom key to send a hash of custom application data:
+  # to play the default sound installed with the application. At least one of these keys must exist.  Any other keys are merged into
+  # the root of the hash payload ultimately sent to the iPhone:
   #
   #   APN::Notification.new(token, {:alert => 'Stuff', :custom => {:code => 23}})
-  #   # Writes this JSON to servers: {"code":23,"aps":{"alert":"Stuff"}}
+  #   # Writes this JSON to servers: {"aps" => {"alert" => "Stuff"}, "custom" => {"code" => 23}}
   # 
   # As a shortcut, APN::Notification.new also accepts a string as the second argument, which it converts into the alert to send.  The 
   # following two lines are equivalent:
@@ -50,14 +50,17 @@ module APN
       [@token.gsub(/[\s|<|>]/,'')].pack('H*')
     end
 
-    # Convert the supplied options into the JSON needed for Apple's push notification servers
+    # Converts the supplied options into the JSON needed for Apple's push notification servers.
+    # Extracts :alert, :badge, and :sound keys into the 'aps' hash, merges any other hash data
+    # into the root of the hash to encode and send to apple.
     def packaged_message
       hsh = {'aps' => {}}
-      hsh['aps']['alert'] = @options[:alert].to_s if @options[:alert]
-      hsh['aps']['badge'] = @options[:badge].to_i if @options[:badge]
-      hsh['aps']['sound'] = @options[:sound] if @options[:sound] and @options[:sound].is_a? String
-      hsh['aps']['sound'] = 'default' if @options[:sound] and @options[:sound].is_a? TrueClass
-      hsh.merge!(@options[:custom]) if @options[:custom]
+      hsh['aps']['alert'] = @options.delete(:alert).to_s if @options[:alert]
+      hsh['aps']['badge'] = @options.delete(:badge).to_i if @options[:badge]
+      if sound = @options.delete(:sound)
+        hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
+      end
+      hsh.merge!(@options)
       hsh.to_json
     end
     

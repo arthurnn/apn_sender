@@ -55,7 +55,7 @@ __END__
 k = 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8'
 c = '0f58e3e2 77237b8f f8213851 c835dee0 376b7a31 9e0484f7 06fe3035 7c5dda2f'
 Resque.enqueue APN::NotificationJob, k, {:alert => 'Resque Test'}
-APN.notify 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8', 'Resque Test'
+APN.notify k, 'Resque Test'
 
 # If you need to really force quit some screwed up workers
 Resque.workers.map{|w| Resque.redis.srem(:workers, w)}
