@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apn_sender}
-  s.version = "0.0.5"
+  s.version = "0.0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kali Donovan"]
-  s.date = %q{2010-05-03}
+  s.date = %q{2010-05-06}
   s.description = %q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them.}
   s.email = %q{kali.donovan@gmail.com}
   s.extra_rdoc_files = [
