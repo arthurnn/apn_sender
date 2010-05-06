@@ -1,12 +1,7 @@
 require 'resque'
 require 'resque/plugins/access_worker_from_job'
 require 'resque/hooks/before_unregister_worker'
-
-begin
-  require 'yajl/json_gem'
-rescue LoadError
-  require 'json'
-end
+require 'json'
 
 require 'apn/queue_manager'
 

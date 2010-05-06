@@ -1,3 +1,10 @@
+= CURRENT STATUS
+
+  This gem is still in development.  It is functional for me, but I'm still working on getting the background daemon running properly (read: haven't tested it at all, expect it to fail).
+  
+  I'll be working on this soon, though, and expect to have a stable version released in the next few weeks (or maybe days).
+  
+
 = apn_sender
 
 So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that Apple's servers may treat non-persistent connections as a Denial of Service attack, and things started looking more complicated.
