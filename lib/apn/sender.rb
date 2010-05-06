@@ -24,7 +24,7 @@ module APN
       
       self.socket.write( notification.to_s )
     rescue SocketError => error
-      apn_log(:error, "Error with connection to #{apn_host} (attempt #{attempt}): #{error}")
+      log(:error, "Error with connection to #{apn_host} (attempt #{attempt}): #{error}")
       
       # Try reestablishing the connection
       teardown_connection

@@ -11,7 +11,7 @@ module APN
         @opts = opts
 
         setup_logger
-        apn_log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
+        log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
         setup_paths
 
         super( APN::QUEUE_NAME ) if self.class.ancestors.include?(Resque::Worker)
@@ -33,8 +33,19 @@ module APN
         end
       end
       
-      def apn_log(level, message)
-        return false unless self.logger
+      # Log message to any logger provided by the user (e.g. the Rails logger).
+      # Accepts +log_level+, +message+, since that seems to make the most sense,
+      # and just +message+, to be compatible with Resque's log method and to enable
+      # sending verbose and very_verbose worker messages to e.g. the rails logger.#
+      #
+      # Perhaps a method definition of +message, +level+ would make more sense, but
+      # that's also the complete opposite of what anyone comming from rails would expect.
+      alias_method(:resque_log, :log) if defined?(log)
+      def log(level, message = nil)
+        level, message = 'info', level if message.nil? # Handle only one argument if called from Resque, which expects only message
+
+        resque_log(message) if defined?(resque_log)
+        return false unless self.logger && self.logger.respond_to?(level)
         self.logger.send(level, "#{Time.now}: #{message}")
       end
       
@@ -71,24 +82,24 @@ module APN
         @socket.sync = true
         @socket.connect
       rescue SocketError => error
-        apn_log(:error, "Error with connection to #{apn_host}: #{error}")
+        log(:error, "Error with connection to #{apn_host}: #{error}")
         raise "Error with connection to #{apn_host}: #{error}"      
       end
 
       # Close open sockets
       def teardown_connection
-        apn_log(:info, "Closing connections...") if @opts[:verbose]
+        log(:info, "Closing connections...") if @opts[:verbose]
 
         begin
           @socket.close if @socket
         rescue Exception => e
-          apn_log(:error, "Error closing SSL Socket: #{e}")
+          log(:error, "Error closing SSL Socket: #{e}")
         end
 
         begin
           @socket_tcp.close if @socket_tcp
         rescue Exception => e
-          apn_log(:error, "Error closing TCP Socket: #{e}")
+          log(:error, "Error closing TCP Socket: #{e}")
         end
       end
       

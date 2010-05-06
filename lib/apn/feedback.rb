@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/connection/base')
+require 'apn/connection/base'
 
 module APN
   # Encapsulates data returned from the {APN Feedback Service}[http://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3].

@@ -1,4 +1,4 @@
-class ApplePushNotificationGenerator < Rails::Generator::Base
+class ApnSenderGenerator < Rails::Generator::Base
 
   def manifest
     record do |m|

@@ -3,5 +3,8 @@
 # Daemons sets pwd to /, so we have to explicitly set RAILS_ROOT
 RAILS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
-require File.join(File.dirname(__FILE__), *%w(.. vendor plugins apple_push_notification lib apple_push_notification sender_daemon))
+require 'rubygems'
+require 'apn'
+require 'apn/sender_daemon'
+
 APN::SenderDaemon.new(ARGV).daemonize
