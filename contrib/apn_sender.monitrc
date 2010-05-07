@@ -5,9 +5,9 @@
 #   3. Install as a monitrc file
 
 check process redis
-  with pidfile /tmp/redis.pid
+  with pidfile /var/run/redis.pid
   group apn_sender
-  start program = "/usr/bin/redis-server /etc/redis.conf"
+  start program = "/usr/bin/redis-server /etc/redis/redis.conf"
   stop program = "/bin/echo SHUTDOWN | nc localhost 6379"
   if failed host 127.0.0.1 port 6379 then restart
   if 5 restarts within 5 cycles then timeout
