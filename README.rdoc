@@ -1,17 +1,20 @@
-= CURRENT STATUS
+== Synopsis
 
-  This gem is still in development.  It is functional for me, but I'm still working on getting the background daemon running properly (read: haven't tested it at all, expect it to fail).
-  
-  I'll be working on this soon, though, and expect to have a stable version released in the next few weeks (or maybe days).
-  
+Need to send background notifications to an iPhone application over a <em>persistent</em> connection in Ruby? Keep reading...
 
-= apn_sender
+== The Story
 
-So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] (<em>Apple Dev account required</em>) that Apple's servers may treat non-persistent connections as a Denial of Service attack, and things started looking more complicated.
+So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad at first.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] that Apple's servers may treat non-persistent connections as a Denial of Service attack, and you realize that Rails has no easy way to maintain a persistent connection internally, and things started looking more complicated.
 
-If this doesn't sound familiar, this gem probably isn't anything you need.  If it does, though...
+The apn_sender gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes the ability to query the Feedback service, helper methods for enqueueing your jobs, and a sample monit config to make sure the background worker is around when you need it.
 
-The apn_sender gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes helper methods for enqueueing your jobs and a sample monit config to make sure the background worker is around when you need it.
+== Yet another ApplePushNotification interface?
+
+Yup.  There's some great code out there already, but we didn't like the idea of getting banned from the APN gateway for establishing a new connection each time we needed to send a batch of messages, and none of the libraries I found handled maintaining a persistent connection.
+
+== Current Status
+
+This gem has been in production use since early May, 2010.  There are no guarantees of complete functionality, of course, but it's working for us. :)
 
 
 == Usage
@@ -39,13 +42,16 @@ Once this is done, you can fire off a background worker with
   
 For production, you're probably better off running a dedicated daemon and setting up monit to watch over it for you.  Luckily, that's pretty easy:
 
-  # To run standard daemon
-  ./script/apn_sender
-  
-  # To pass in options
-  ./script/apn_sender -- --cert-path=PATH_TO_NONSTANDARD_FOLDER_WITH_PEM_FILES --environment=production
+  # To generate daemon
+  ./script/generate apn_sender
+
+  # To run daemon. Pass --help to print all options
+  ./script/apn_sender --environment=production --verbose start
 
 Note the --environment must be explicitly set (separately from your <code>RAILS_ENV</code>) to production in order to send messages via the production APN servers.  Any other environment sends messages through Apple's sandbox servers at <code>gateway.sandbox.push.apple.com</code>.
+
+Check <code>RAILS_ROOT/logs/apn_sender.log</code> for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
+
 
 === 3. Checking Apple's Feedback Service
   
@@ -71,7 +77,7 @@ If you're interested in knowing exactly <em>when</em> Apple determined each toke
     # ... custom logic here
   end
 
-The Feedback Service works as a big queue, and when you connect it pops off all its data and sends it over the wire.  This means that connecting a second time will return an empty array.  For ease of use, a call to either +tokens+ or +data+ will connect once and cache the data, so if you call either one again it'll continue to use its cached version rather than connecting to Apple a second time to retrieve an empty array.
+The Feedback Service works as a big queue.  When you connect it pops off all its data and sends it over the wire at once, which means connecting a second time will return an empty array, so for ease of use a call to either +tokens+ or +data+ will connect once and cache the data.  If you call either one again it'll continue to use its cached version (rather than connecting to Apple a second time to retrieve an empty array, which is probably not what you want).
 
 Forcing a reconnect is as easy as calling either method with the single parameter +true+, but be sure you've already used the existing data because you'll never get it back.
 

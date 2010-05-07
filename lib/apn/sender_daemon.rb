@@ -4,12 +4,17 @@ require 'daemons'
 require 'optparse'
 
 module APN
+  # A wrapper designed to daemonize an APN::Sender instance to keep in running in the background.
+  # Connects worker's output to the Rails logger, if available.  Creates a pid file suitable for
+  # monitoring with {monit}[http://mmonit.com/monit/].
+  #
+  # Based off delayed_job's great example.  To use in a Rails app, <code>script/generate apn_sender</code>.
   class SenderDaemon
     
     def initialize(args)
-      @options = {:quiet => true, :worker_count => 1, :environment => :development}
+      @options = {:quiet => true, :worker_count => 1, :environment => :development, :delay => 5}
       
-      opts = OptionParser.new do |opts|
+      optparse = OptionParser.new do |opts|
         opts.banner = "Usage: #{File.basename($0)} [options] start|stop|restart|run"
 
         opts.on('-h', '--help', 'Show this message') do
@@ -38,8 +43,7 @@ module APN
       
       # If no arguments, give help screen
       @args = optparse.parse!(args.empty? ? ['-h'] : args)
-      
-      puts "OPTS: #{@options.inspect}"
+      @options[:verbose] = true if @options[:very_verbose]
     end
   
     def daemonize

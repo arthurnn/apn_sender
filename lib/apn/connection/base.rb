@@ -4,6 +4,8 @@ require 'resque'
 
 module APN
   module Connection
+    # APN::Connection::Base takes care of all the boring certificate loading, socket creating, and logging
+    # responsibilities so APN::Sender and APN::Feedback and focus on their respective specialties.
     module Base
       attr_accessor :opts, :logger
       
@@ -25,6 +27,7 @@ module APN
             
       protected
       
+      # Default to Rails or Merg logger, if available
       def setup_logger
         @logger = if defined?(Merb::Logger)
           Merb.logger

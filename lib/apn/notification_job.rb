@@ -9,7 +9,7 @@ module APN
     # Build a notification from arguments and send to Apple
     def self.perform(token, opts)
       msg = APN::Notification.new(token, opts)
-      raise "Invalid notification options: #{opts.inspect}" unless msg.valid?
+      raise "Invalid notification options (did you provide :alert, :badge, or :sound?): #{opts.inspect}" unless msg.valid?
 
       worker.send_to_apple( msg )
     end

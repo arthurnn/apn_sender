@@ -54,23 +54,23 @@ __END__
 ## To enqueue test job
 k = 'ceecdc18 ef17b2d0 745475e0 0a6cd5bf 54534184 ac2649eb 40873c81 ae76dbe8'
 c = '0f58e3e2 77237b8f f8213851 c835dee0 376b7a31 9e0484f7 06fe3035 7c5dda2f'
-Resque.enqueue APN::NotificationJob, k, {:alert => 'Resque Test'}
 APN.notify k, 'Resque Test'
 
 # If you need to really force quit some screwed up workers
 Resque.workers.map{|w| Resque.redis.srem(:workers, w)}
 
-## To run worker from rake task
+# To run worker from rake task
 CERT_PATH=/Users/kali/Code/insurrection/certs/ ENVIRONMENT=production rake apn:work
 
-## To run worker from IRB 
+# To run worker from IRB 
 Resque.workers.map(&:unregister_worker)
 require 'ruby-debug'
 worker = APN::Sender.new(:cert_path => '/Users/kali/Code/insurrection/certs/', :environment => :production)
 worker.very_verbose = true
 worker.work(5)
 
-## To run worker as daemon - NOT YET TESTED
-APN::SenderDaemon.new(ARGV).daemonize
+# To run worker as daemon
+args = ['--environment=production', '--cert-path=/Users/kali/Code/insurrection/certs/']
+APN::SenderDaemon.new(args).daemonize
 
 

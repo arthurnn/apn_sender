@@ -59,13 +59,14 @@ module APN
     # Extracts :alert, :badge, and :sound keys into the 'aps' hash, merges any other hash data
     # into the root of the hash to encode and send to apple.
     def packaged_message
+      opts = @options.clone # Don't destroy our pristine copy
       hsh = {'aps' => {}}
-      hsh['aps']['alert'] = @options.delete(:alert).to_s if @options[:alert]
-      hsh['aps']['badge'] = @options.delete(:badge).to_i if @options[:badge]
-      if sound = @options.delete(:sound)
+      hsh['aps']['alert'] = opts.delete(:alert).to_s if opts[:alert]
+      hsh['aps']['badge'] = opts.delete(:badge).to_i if opts[:badge]
+      if sound = opts.delete(:sound)
         hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
       end
-      hsh.merge!(@options)
+      hsh.merge!(opts)
       hsh.to_json
     end
     
