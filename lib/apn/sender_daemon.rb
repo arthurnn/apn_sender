@@ -4,10 +4,6 @@ require 'daemons'
 require 'optparse'
 require 'logger'
 
-require 'apn/queue_name'
-require 'apn/connection/base'
-require 'apn/sender'
-
 module APN
   # A wrapper designed to daemonize an APN::Sender instance to keep in running in the background.
   # Connects worker's output to a custom logger, if available.  Creates a pid file suitable for
