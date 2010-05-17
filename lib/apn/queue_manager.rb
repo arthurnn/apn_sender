@@ -3,6 +3,11 @@
 # example implementation
 
 module APN
+  # Enqueues a notification to be sent in the background via the persistent TCP socket, assuming apn_sender is running (or will be soon)
+  def self.notify(token, opts = {})
+    APN::QueueManager.enqueue(APN::NotificationJob, token, opts)
+  end  
+  
   # Extends Resque, allowing us to add all the callbacks to Resque we desire without affecting the expected
   # functionality in the parent app, if we're included in e.g. a Rails application.
   class QueueManager

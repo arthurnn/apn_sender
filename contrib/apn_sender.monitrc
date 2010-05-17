@@ -1,8 +1,8 @@
 # An example Monit configuration file for running the apn_sender background daemon
 #
-#   1. Replace #{app_name} with the path to your configuration
+#   1. Replace #{app_name} with your application name
 #   2. Add any arguments between apn_sender the and start/stop command
-#   3. Install as a monitrc file
+#   3. Install as a monitrc file (paste to bottom of /etc/monit/monitrc, or save as a .monitrc file and include in the main config)
 
 check process redis
   with pidfile /var/run/redis.pid
@@ -14,8 +14,8 @@ check process redis
 
 
 check process apn_sender
-  with pidfile /var/www/apps/#{app_name}/shared/pids/apn_sender.pid
+  with pidfile /var/www/#{app_name}/shared/pids/apn_sender.pid
   group apn_sender
-  start program = "/usr/bin/env RAILS_ENV=production /var/www/apps/{app_name}/current/script/apn_sender --environment=production start"
-  stop program = "/usr/bin/env RAILS_ENV=production /var/www/apps/{app_name}/current/script/apn_sender --environment=production stop"
+  start program = "/var/www/#{app_name}/current/script/apn_sender --environment=production --verbose start"
+  stop program = "/var/www/{#app_name}/current/script/apn_sender --environment=production --verbose stop"
   depends_on redis

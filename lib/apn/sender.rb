@@ -19,7 +19,7 @@ module APN
     # Send a raw string over the socket to Apple's servers (presumably already formatted by APN::Notification)
     def send_to_apple( notification, attempt = 0 )
       if attempt > TIMES_TO_RETRY_SOCKET_ERROR
-        raise "Error with connection to #{apn_host} (retried #{TIMES_TO_RETRY_SOCKET_ERROR} times): #{error}"
+        log_and_die("Error with connection to #{apn_host} (retried #{TIMES_TO_RETRY_SOCKET_ERROR} times): #{error}")
       end
       
       self.socket.write( notification.to_s )
@@ -73,4 +73,5 @@ worker.work(5)
 args = ['--environment=production', '--cert-path=/Users/kali/Code/insurrection/certs/']
 APN::SenderDaemon.new(args).daemonize
 
-
+# To run daemonized version in Rails app
+./script/apn_sender --environment=production start

@@ -52,6 +52,12 @@ module APN
         self.logger.send(level, "#{Time.now}: #{message}")
       end
       
+      # Log the message first, to ensure it reports what went wrong if in daemon mode. Then die, because something went horribly wrong.
+      def log_and_die(msg)
+        log(:fatal, msg)
+        raise msg
+      end
+      
       def apn_production?
         @opts[:environment] && @opts[:environment] != '' && :production == @opts[:environment].to_sym
       end
@@ -62,19 +68,20 @@ module APN
         @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
         @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
         
-        raise "Missing certificate path. Please specify :cert_path when initializing class." unless @opts[:cert_path]
+        log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
+        
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
         cert_path = File.join(@opts[:cert_path], cert_name)
 
         @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
-        raise "Missing apple push notification certificate in #{cert_path}" unless @apn_cert
+        log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
       end
       
       # Open socket to Apple's servers
       def setup_connection
-        raise "Missing apple push notification certificate" unless @apn_cert
+        log_and_die("Missing apple push notification certificate") unless @apn_cert
         return true if @socket && @socket_tcp
-        raise "Trying to open half-open connection" if @socket || @socket_tcp
+        log_and_die("Trying to open half-open connection") if @socket || @socket_tcp
 
         ctx = OpenSSL::SSL::SSLContext.new
         ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
@@ -85,8 +92,7 @@ module APN
         @socket.sync = true
         @socket.connect
       rescue SocketError => error
-        log(:error, "Error with connection to #{apn_host}: #{error}")
-        raise "Error with connection to #{apn_host}: #{error}"      
+        log_and_die("Error with connection to #{apn_host}: #{error}")
       end
 
       # Close open sockets

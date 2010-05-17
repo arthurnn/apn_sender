@@ -1,18 +1,24 @@
-# Modified slightly from delayed_job's delayed/command.rb
+# Based roughly on delayed_job's delayed/command.rb
 require 'rubygems'
 require 'daemons'
 require 'optparse'
+require 'logger'
+
+require 'apn/queue_name'
+require 'apn/connection/base'
+require 'apn/sender'
 
 module APN
   # A wrapper designed to daemonize an APN::Sender instance to keep in running in the background.
-  # Connects worker's output to the Rails logger, if available.  Creates a pid file suitable for
+  # Connects worker's output to a custom logger, if available.  Creates a pid file suitable for
   # monitoring with {monit}[http://mmonit.com/monit/].
   #
-  # Based off delayed_job's great example.  To use in a Rails app, <code>script/generate apn_sender</code>.
+  # Based off delayed_job's great example, except we can be much lighter by not loading the entire
+  # Rails environment.  To use in a Rails app, <code>script/generate apn_sender</code>.
   class SenderDaemon
     
     def initialize(args)
-      @options = {:quiet => true, :worker_count => 1, :environment => :development, :delay => 5}
+      @options = {:worker_count => 1, :environment => :development, :delay => 5}
       
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: #{File.basename($0)} [options] start|stop|restart|run"
@@ -24,16 +30,16 @@ module APN
         opts.on('-e', '--environment=NAME', 'Specifies the environment to run this apn_sender under ([development]/production).') do |e|
           @options[:environment] = e
         end
-        opts.on('--cert-path=NAME', '--certificate-path=NAME', 'Path to directory containing apn .pem certificates.') do |path|
+        opts.on('--cert-path=NAME', 'Path to directory containing apn .pem certificates.') do |path|
           @options[:cert_path] = path
         end
-        opts.on('-n', '--number_of_workers=WORKERS', "Number of unique workers to spawn") do |worker_count|
+        opts.on('-n', '--number-of-workers=WORKERS', "Number of unique workers to spawn") do |worker_count|
           @options[:worker_count] = worker_count.to_i rescue 1
         end
         opts.on('-v', '--verbose', "Turn on verbose mode") do
           @options[:verbose] = true
         end
-        opts.on('-V', '--very_verbose', "Turn on very verbose mode") do
+        opts.on('-V', '--very-verbose', "Turn on very verbose mode") do
           @options[:very_verbose] = true
         end
         opts.on('-d', '--delay=D', "Delay between rounds of work (seconds)") do |d|
@@ -56,14 +62,7 @@ module APN
     end
     
     def run(worker_name = nil)
-      Dir.chdir(::RAILS_ROOT)
-      require File.join(::RAILS_ROOT, 'config', 'environment')
-      
-      # Replace the default logger
       logger = Logger.new(File.join(::RAILS_ROOT, 'log', 'apn_sender.log'))
-      logger.level = ActiveRecord::Base.logger.level
-      ActiveRecord::Base.logger = logger
-      ActiveRecord::Base.clear_active_connections!
       
       worker = APN::Sender.new(@options)
       worker.logger = logger
@@ -71,8 +70,8 @@ module APN
       worker.very_verbose = @options[:very_verbose]
       worker.work(@options[:delay])
     rescue => e
-      logger.fatal(e) if logger.respond_to?(:fatal)
       STDERR.puts e.message
+      logger.fatal(e) if logger && logger.respond_to?(:fatal)
       exit 1
     end
     
