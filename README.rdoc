@@ -87,6 +87,21 @@ Forcing a reconnect is as easy as calling either method with the single paramete
 
 If you're sending notifications, you should definitely call one of the <code>receive</code> methods periodically, as Apple's policies require it and they apparently monitors providers for compliance.  I'd definitely recommend throwing together a quick rake task to take care of this for you (the {whenever library}[http://github.com/javan/whenever] provides a nice wrapper around scheduling tasks to run at certain times (for systems with cron enabled)).
 
+Just for the record, this is essentially what you want to have whenever run periodically for you:
+
+  def self.clear_uninstalled_applications
+    feedback_data = APN::Feedback.new(:environment => :production).data
+  
+    feedback_data.each do |item|
+      user = User.find_by_iphone_token( item.token )
+      
+      if user.iphone_token_updated_at && user.iphone_token_updated_at > item.timestamp
+        return true # App has been reregistered since Apple determined it'd been uninstalled
+      else
+        user.update_attributes(:iphone_token => nil, :iphone_token_updated_at => Time.now) 
+      end
+    end
+  end
 
 
 
