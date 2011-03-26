@@ -67,7 +67,7 @@ module APN
         hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
       end
       hsh.merge!(opts)
-      hsh.to_json
+      ActiveSupport::JSON::encode(hsh)
     end
     
     # Symbolize keys, using ActiveSupport if available
