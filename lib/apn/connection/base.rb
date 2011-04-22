@@ -31,8 +31,8 @@ module APN
       def setup_logger
         @logger = if defined?(Merb::Logger)
           Merb.logger
-        elsif defined?(RAILS_DEFAULT_LOGGER)
-          RAILS_DEFAULT_LOGGER
+        elsif defined?(::Rails.logger)
+          ::Rails.logger
         end
       end
       
@@ -65,8 +65,8 @@ module APN
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
         # Set option defaults
-        @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
-        @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
+        @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
+        @opts[:environment] ||= ::Rails.env if defined?(::Rails.env)
         
         log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
         
