@@ -6,10 +6,12 @@ module APN
   # End result: single persistent TCP connection to Apple, so they don't ban you for frequently opening and closing connections,
   # which they apparently view as a DOS attack.
   #
-  # Accepts <code>:environment</code> (production vs anything else) and <code>:cert_path</code> options on initialization.  If called in a 
+  # Accepts <code>:environment</code> (production vs anything else), <code>:cert_pass</code> and <code>:cert_path</code> options on initialization.  If called in a 
   # Rails context, will default to RAILS_ENV and RAILS_ROOT/config/certs. :environment will default to development.  
   # APN::Sender expects two files to exist in the specified <code>:cert_path</code> directory: 
   # <code>apn_production.pem</code> and <code>apn_development.pem</code>.
+  #
+  # Use the <code>:cert_pass</code> option if your certificates require a password
   #
   # If a socket error is encountered, will teardown the connection and retry again twice before admitting defeat.
   class Sender < ::Resque::Worker
