@@ -11,7 +11,7 @@ namespace :apn do
     worker = nil
 
     begin
-      worker = APN::Sender.new(:cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'])
+      worker = APN::Sender.new(:full_cert_path => ENV['FULL_CERT_PATH'], :cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'])
       worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
       worker.very_verbose = ENV['VVERBOSE']
     rescue Exception => e

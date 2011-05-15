@@ -49,9 +49,11 @@ For production, you're probably better off running a dedicated daemon and settin
   # To run daemon. Pass --help to print all options
   ./script/apn_sender --environment=production --verbose start
 
-Note the --environment must be explicitly set (separately from your <code>RAILS_ENV</code>) to production in order to send messages via the production APN servers.  Any other environment sends messages through Apple's sandbox servers at <code>gateway.sandbox.push.apple.com</code>.
+Note the --environment must be explicitly set (separately from your <code>Rails.env</code>) to production in order to send messages via the production APN servers.  Any other environment sends messages through Apple's sandbox servers at <code>gateway.sandbox.push.apple.com</code>.
 
-Check <code>RAILS_ROOT/logs/apn_sender.log</code> for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
+Also, there are two similar options <code>:cert_path</code> and <code>:full_cert_path</code>.  The former specifies the directory in which to file the .pem file (either apn_production.pem or apn_development.pem, depending on the environment). The latter specifies a .pem file explicitly, allowing customized certificate names for those that need them.
+
+Check <code>logs/apn_sender.log</code> for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
 
 
 === 3. Checking Apple's Feedback Service
@@ -60,7 +62,7 @@ Since push notifications are a fire-and-forget sorta deal, where you get no indi
 
 It's actually really simple - you connect to them periodically and they give you a big dump of tokens you shouldn't send to anymore.  The gem wraps this up nicely -- just call:
 
-  # APN::Feedback accepts the same optional :environment and :cert_path options as APN::Sender
+  # APN::Feedback accepts the same optional :environment and :cert_path / :full_cert_path options as APN::Sender
   feedback = APN::Feedback.new()
 
   tokens = feedback.tokens # => Array of device tokens
