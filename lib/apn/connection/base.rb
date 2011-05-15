@@ -29,8 +29,8 @@ module APN
       
       # Default to Rails or Merg logger, if available
       def setup_logger
-        @logger = if defined?(Merb::Logger)
-          Merb.logger
+        @logger = if defined?(::Merb::Logger)
+          ::Merb.logger
         elsif defined?(::Rails.logger)
           ::Rails.logger
         end
@@ -39,7 +39,7 @@ module APN
       # Log message to any logger provided by the user (e.g. the Rails logger).
       # Accepts +log_level+, +message+, since that seems to make the most sense,
       # and just +message+, to be compatible with Resque's log method and to enable
-      # sending verbose and very_verbose worker messages to e.g. the rails logger.#
+      # sending verbose and very_verbose worker messages to e.g. the rails logger.
       #
       # Perhaps a method definition of +message, +level+ would make more sense, but
       # that's also the complete opposite of what anyone comming from rails would expect.
@@ -52,7 +52,8 @@ module APN
         self.logger.send(level, "#{Time.now}: #{message}")
       end
       
-      # Log the message first, to ensure it reports what went wrong if in daemon mode. Then die, because something went horribly wrong.
+      # Log the message first, to ensure it reports what went wrong if in daemon mode. 
+      # Then die, because something went horribly wrong.
       def log_and_die(msg)
         log(:fatal, msg)
         raise msg
@@ -64,8 +65,9 @@ module APN
       
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
-        # Set option defaults
-        @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
+        # Set option defaults. RAILS_ROOT is still here not from Rails, but to handle passing in root from sender_daemon
+        @opts[:root_path] ||= defined?(::Rails.root) ? ::Rails.root.to_s : (defined?(RAILS_ROOT) ? RAILS_ROOT : '/')
+        @opts[:cert_path] ||= File.join(File.expand_path(@opts[:root_path]), "config", "certs")
         @opts[:environment] ||= ::Rails.env if defined?(::Rails.env)
         
         log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
