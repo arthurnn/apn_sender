@@ -4,7 +4,7 @@ Need to send background notifications to an iPhone application over a <em>persis
 
 == The Story
 
-So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad at first.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] that Apple's servers may treat non-persistent connections as a Denial of Service attack, and you realize that Rails has no easy way to maintain a persistent connection internally, and things started looking more complicated.
+So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad at first.  But then you read in the {Apple Documentation}[https://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/WhatAreRemoteNotif/WhatAreRemoteNotif.html#//apple_ref/doc/uid/TP40008194-CH102-SW7] that Apple's servers may treat non-persistent connections as a Denial of Service attack, and you realize that Rails has no easy way to maintain a persistent connection internally, and things start looking more complicated.
 
 The apn_sender gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes the ability to query the Feedback service, helper methods for enqueueing your jobs, and a sample monit config to make sure the background worker is around when you need it.
 
@@ -15,7 +15,7 @@ Yup.  There's some great code out there already, but we didn't like the idea of 
 == Current Status
 
 This gem has been in production use since early May, 2010.  There are no guarantees of complete functionality, of course, but it's working for us. :)
-
+** UPDATE: our site is now defunct (for completely-unrelated reasons), but the many forks and watchers make me think something's going right. **
 
 == Usage
 
@@ -85,7 +85,7 @@ Forcing a reconnect is as easy as calling either method with the single paramete
 
 ==== Warning: No really, check Apple's Feedback Service occasionally
 
-If you're sending notifications, you should definitely call one of the <code>receive</code> methods periodically, as Apple's policies require it and they apparently monitors providers for compliance.  I'd definitely recommend throwing together a quick rake task to take care of this for you (the {whenever library}[http://github.com/javan/whenever] provides a nice wrapper around scheduling tasks to run at certain times (for systems with cron enabled)).
+If you're sending notifications, you should definitely call one of the <code>receive</code> methods periodically, as Apple's policies require it and they apparently monitor providers for compliance.  I'd definitely recommend throwing together a quick rake task to take care of this for you (the {whenever library}[http://github.com/javan/whenever] provides a nice wrapper around scheduling tasks to run at certain times (for systems with cron enabled)).
 
 Just for the record, this is essentially what you want to have whenever run periodically for you:
 
@@ -115,11 +115,15 @@ There's also an included sample <code>apn_sender.monitrc</code> file in the <cod
 
 APN is built on top of {Resque}[http://github.com/defunkt/resque] (an awesome {Redis}[http://code.google.com/p/redis/]-based background runner similar to {delayed_job}[http://github.com/collectiveidea/delayed_job]). Read through the {Resque README}[http://github.com/defunkt/resque#readme] to get a feel for what's going on, follow the installation instructions there, and then run:
 
-  $ sudo gem install apn_sender
+  $ gem install apn_sender
 
-In your Rails app, add
+In your Rails app, add (2.3.x):
 
   config.gem 'apn_sender', :lib => 'apn'
+  
+or (3.x) to your Gemfile:
+  
+  gem 'apn_sender', :require => 'apn'
   
 To add a few useful rake tasks for running workers, add the following line to your Rakefile:
 
