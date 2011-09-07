@@ -29,8 +29,8 @@ module APN
       
       # Default to Rails or Merg logger, if available
       def setup_logger
-        @logger = if defined?(::Merb::Logger)
-          ::Merb.logger
+        @logger = if defined?(Merb::Logger)
+          Merb.logger
         elsif defined?(::Rails.logger)
           ::Rails.logger
         end
@@ -89,7 +89,12 @@ module APN
 
         ctx = OpenSSL::SSL::SSLContext.new
         ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
-        ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
+        
+        if @opts[:cert_pass]
+          ctx.key = OpenSSL::PKey::RSA.new(@apn_cert, @opts[:cert_pass])
+        else
+          ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
+        end
 
         @socket_tcp = TCPSocket.new(apn_host, apn_port)
         @socket = OpenSSL::SSL::SSLSocket.new(@socket_tcp, ctx)
