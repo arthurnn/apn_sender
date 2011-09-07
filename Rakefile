@@ -9,7 +9,7 @@ begin
     gem.name = "apn_sender"
     gem.summary = %Q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket.}
     gem.description = %Q{Resque-based background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them.}
-    gem.email = "kali.donovan@gmail.com"
+    gem.email = "kali@deviantech.com"
     gem.homepage = "http://github.com/kdonovan/apple_push_notification"
     gem.authors = ["Kali Donovan"]
     gem.add_dependency 'resque'
