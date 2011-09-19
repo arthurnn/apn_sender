@@ -1,3 +1,9 @@
+== UPDATE Sept 19, 2011: current status
+
+  The project I built this for was cancelled months ago, which means I don't have valid PEM keys or any infrastructure in place to test.  I hope to start a new iOS app as soon as the jQuery Mobile team releases their 1.0 release, but in the meantime you're better off looking at the community for help with any issues that come up.  Sorry for the inconvenience, and hopefully I'll be able to dive back into this soon!
+
+-----
+
 == Synopsis
 
 Need to send background notifications to an iPhone application over a <em>persistent</em> connection in Ruby? Keep reading...
