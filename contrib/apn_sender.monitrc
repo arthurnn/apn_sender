@@ -19,4 +19,4 @@ check process apn_sender
   start program = "/var/www/#{app_name}/current/script/apn_sender --environment=production --verbose start"
   stop program = "/var/www/{#app_name}/current/script/apn_sender --environment=production --verbose stop"
   if 2 restarts within 3 cycles then timeout
-  depends_on redis
+  depends on redis
