@@ -61,7 +61,10 @@ module APN
     def packaged_message
       opts = @options.clone # Don't destroy our pristine copy
       hsh = {'aps' => {}}
-      hsh['aps']['alert'] = opts.delete(:alert).to_s if opts[:alert]
+      if alert = opts.delete(:alert)
+        alert = alert.to_s unless alert.is_a?(Hash)
+        hsh['aps']['alert'] = alert
+      end
       hsh['aps']['badge'] = opts.delete(:badge).to_i if opts[:badge]
       if sound = opts.delete(:sound)
         hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
