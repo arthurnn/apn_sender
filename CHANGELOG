@@ -1,0 +1,4 @@
+* 1.0.6
+- Added support for password-protected .pem files
+- Read feedback data in 38-byte chunks
+- Support passing dictionary as :alert key
