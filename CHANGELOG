@@ -2,3 +2,4 @@
 - Added support for password-protected .pem files
 - Read feedback data in 38-byte chunks
 - Support passing dictionary as :alert key
+- Logging to STDOUT if no other loggers present

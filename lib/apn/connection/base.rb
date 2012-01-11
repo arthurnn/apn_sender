@@ -34,6 +34,7 @@ module APN
         elsif defined?(::Rails.logger)
           ::Rails.logger
         end
+        @logger ||= Logger.new(STDOUT)
       end
       
       # Log message to any logger provided by the user (e.g. the Rails logger).
