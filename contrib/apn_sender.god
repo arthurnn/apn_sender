@@ -9,11 +9,13 @@ rails_root = "/var/www/#{app_name}/current"
 
 # Resque
 God.watch do |w|
-  w.dir = "#{rails_root}"
-  w.name = "resque"
+  w.dir      = "#{rails_root}"
+  w.name     = "apn_sender-#{rails_env}"
+  w.group    = "resque-#{rails_env}"
   w.interval = 60.seconds
-  w.start = "#{rails_root}/script/apn_sender.rb --environment=#{rails_env} --verbose start"
-  w.stop = "#{rails_root}/script/apn_sender.rb --environment=#{rails_env} --verbose stop"
+  w.env      = {"VERBOSE" => "1", "ENVIRONMENT" => rails_env}
+  w.start    = "bundle exec rake apn:sender"
+  w.log      = "#{rails_root}/log/apn_sender.log"
 
   # restart if memory gets too high
   w.transition(:up, :restart) do |on|
