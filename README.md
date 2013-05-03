@@ -140,12 +140,12 @@ APN is built on top of [Resque](http://github.com/defunkt/resque) (an awesome [R
 In your Rails app, add (2.3.x):
 
 ```
-  config.gem 'apn_sender', :lib #> 'apn'
+  config.gem 'apn_sender', :lib => 'apn'
 ``` 
 or (3.x) to your Gemfile:
 
 ```  
-  gem 'apn_sender', :require #> 'apn'
+  gem 'apn_sender', require: 'apn'
 ```  
 To add a few useful rake tasks for running workers, add the following line to your Rakefile:
 
