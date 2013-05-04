@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("resque", [">= 0"])
   s.add_dependency("resque-access_worker_from_job", [">= 0"])
+  s.add_dependency("active_support", [">= 0"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG LICENSE README.md Rakefile)
   s.require_path = 'lib'
