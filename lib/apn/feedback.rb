@@ -16,14 +16,14 @@ module APN
       token
     end
   end
-  
+
   # When supplied with the certificate path and the desired environment, connects to the {APN Feedback Service}[http://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3]
   # and returns any response as an array of APN::FeedbackItem elements.
-  # 
+  #
   # See README for usage and details.
   class Feedback
     include APN::Connection::Base
-        
+
     # Returns array of APN::FeedbackItem elements read from Apple. Connects to Apple once and caches the
     # data, continues to returns cached data unless called with <code>data(true)</code>, which clears the
     # existing feedback array.  Note that once you force resetting the cache you loose all previous feedback,
@@ -32,25 +32,25 @@ module APN
       @feedback = nil if force
       @feedback ||= receive
     end
-    
+
     # Wrapper around +data+ returning just an array of token strings.
     def tokens(force = nil)
       data(force).map(&:token)
     end
-    
+
     # Prettify to return meaningful status information when printed. Can't add these directly to connection/base, because Resque depends on decoding to_s
     def inspect
       "#<#{self.class.name}: #{to_s}>"
     end
-    
+
     # Prettify to return meaningful status information when printed. Can't add these directly to connection/base, because Resque depends on decoding to_s
     def to_s
       "#{@socket ? 'Connected' : 'Connection not currently established'} to #{apn_host} on #{apn_port}"
     end
-    
+
     protected
-        
-    # Connects to Apple's Feedback Service and checks if there's anything there for us.  
+
+    # Connects to Apple's Feedback Service and checks if there's anything there for us.
     # Returns an array of APN::FeedbackItem pairs
     def receive
       feedback = []
@@ -69,23 +69,15 @@ module APN
 
       return feedback
     end
-    
-    
+
+
     def apn_host
       @apn_host ||= apn_production? ? "feedback.push.apple.com" : "feedback.sandbox.push.apple.com"
     end
-    
+
     def apn_port
       2196
     end
-    
+
   end
 end
-
-
-
-__END__
-# Testing from irb
-irb -r 'lib/apn/feedback'
-
-a=APN::Feedback.new(:cert_path => '/Users/kali/Code/insurrection/certs/', :environment => :production)

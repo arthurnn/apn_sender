@@ -12,7 +12,7 @@ module APN
       raise "Invalid notification options (did you provide :alert, :badge, or :sound?): #{opts.inspect}" unless msg.valid?
 
       raise "APN::NotificationJob was picked up by a non-APN:Sender resque worker. Aborting." unless worker
-      worker.send_to_apple( msg )
+      worker.send_to_apple(msg)
     end
 
 

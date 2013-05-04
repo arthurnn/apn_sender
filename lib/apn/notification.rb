@@ -10,8 +10,8 @@ module APN
   #
   #   APN::Notification.new(token, {:alert => 'Stuff', :custom => {:code => 23}})
   #   # Writes this JSON to servers: {"aps" => {"alert" => "Stuff"}, "custom" => {"code" => 23}}
-  # 
-  # As a shortcut, APN::Notification.new also accepts a string as the second argument, which it converts into the alert to send.  The 
+  #
+  # As a shortcut, APN::Notification.new also accepts a string as the second argument, which it converts into the alert to send.  The
   # following two lines are equivalent:
   #
   #   APN::Notification.new(token, 'Some Alert')
@@ -19,13 +19,13 @@ module APN
   #
   class Notification
     # Available to help clients determine before they create the notification if their message will be too large.
-    # Each iPhone Notification payload must be 256 or fewer characters.  Encoding a null message has a 57 
+    # Each iPhone Notification payload must be 256 or fewer characters.  Encoding a null message has a 57
     # character overhead, so there are 199 characters available for the alert string.
-    MAX_ALERT_LENGTH = 199 
-    
+    MAX_ALERT_LENGTH = 199
+
     attr_accessor :options, :token
     def initialize(token, opts)
-      @options = hash_as_symbols(opts.is_a?(Hash) ? opts : {:alert => opts})
+      @options = opts.is_a?(Hash) ? opts.symbolize_keys : {:alert => opts}
       @token = token
 
       raise "The maximum size allowed for a notification payload is 256 bytes." if packaged_notification.size.to_i > 256
@@ -34,20 +34,20 @@ module APN
     def to_s
       packaged_notification
     end
-    
+
     # Ensures at least one of <code>%w(alert badge sound)</code> is present
     def valid?
-      return true if %w(alert badge sound).any?{|key| options.keys.include?(key.to_sym) }
+      return true if [:alert, :badge, :sound].any?{|key| options.keys.include?(key) }
       false
     end
-    
+
     protected
 
     # Completed encoded notification, ready to send down the wire to Apple
     def packaged_notification
       pt = packaged_token
       pm = packaged_message
-      [0, 0, 32, pt, 0, pm.size, pm].pack("ccca*cca*") 
+      [0, 0, 32, pt, 0, pm.size, pm].pack("ccca*cca*")
     end
 
     # Device token, compressed and hex-ified
@@ -72,18 +72,6 @@ module APN
       hsh.merge!(opts)
       ActiveSupport::JSON::encode(hsh)
     end
-    
-    # Symbolize keys, using ActiveSupport if available
-    def hash_as_symbols(hash)
-      if hash.respond_to?(:symbolize_keys)
-        return hash.symbolize_keys
-      else
-       hash.inject({}) do |opt, (key, value)|
-         opt[(key.to_sym rescue key) || key] = value
-         opt
-       end
-     end
-   end
-   
- end   
+
+  end
 end
