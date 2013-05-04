@@ -19,4 +19,16 @@ rdoc
 pkg
 .rvmrc
 
-## PROJECT::SPECIFIC
+# don't commit Gemfile.lock
+Gemfile.lock
+*.gem
+
+# rdoc generated
+rdoc
+
+# yard generated
+doc
+.yardoc
+
+# bundler
+.bundle
