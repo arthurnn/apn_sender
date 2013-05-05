@@ -41,8 +41,6 @@ module APN
       false
     end
 
-    protected
-
     # Completed encoded notification, ready to send down the wire to Apple
     def packaged_notification
       pt = packaged_token
@@ -72,6 +70,5 @@ module APN
       hsh.merge!(opts)
       ActiveSupport::JSON::encode(hsh)
     end
-
   end
 end
