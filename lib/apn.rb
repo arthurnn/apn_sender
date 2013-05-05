@@ -1,8 +1,9 @@
+require "active_support/core_ext"
+require "active_support/json"
+
 require 'resque'
 require 'resque/plugins/access_worker_from_job'
 require 'resque/hooks/before_unregister_worker'
-require 'json'
-require 'active_support'
 
 require 'apn/queue_name'
 require 'apn/queue_manager'
