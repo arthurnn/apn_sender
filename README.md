@@ -1,6 +1,8 @@
+[![Code Climate](https://codeclimate.com/github/arthurnn/apn_sender.png)](https://codeclimate.com/github/arthurnn/apn_sender)
+
 ## UPDATE May 3, 2013: current status
 
-This project was not supported for a while, but we are going to support it again. 
+This project was not supported for a while, but we are going to support it again.
 
 -----
 
@@ -70,7 +72,7 @@ Check ```logs/apn_sender.log``` for debugging output.  In addition to logging an
 
 
 ### 3. Checking Apple's Feedback Service
-  
+
 Since push notifications are a fire-and-forget sorta deal, where you get no indication if your message was received (or if the specified recipient even exists), Apple needed to come up with some other way to ensure their network isn't clogged with thousands of bogus messages (e.g. from developers sending messages to phones where their application <em>used</em> to be installed, but where the user has since removed it).  Hence, the Feedback Service.
 
 It's actually really simple - you connect to them periodically and they give you a big dump of tokens you shouldn't send to anymore.  The gem wraps this up nicely -- just call:
@@ -111,14 +113,14 @@ Just for the record, this is essentially what you want to have whenever run peri
 ```
 def self.clear_uninstalled_applications
   feedback_data # APN::Feedback.new(:environment #> :production).data
-  
+
   feedback_data.each do |item|
     user # User.find_by_iphone_token( item.token )
-      
+
     if user.iphone_token_updated_at && user.iphone_token_updated_at > item.timestamp
       return true # App has been reregistered since Apple determined it'd been uninstalled
     else
-      user.update_attributes(:iphone_token #> nil, :iphone_token_updated_at #> Time.now) 
+      user.update_attributes(:iphone_token #> nil, :iphone_token_updated_at #> Time.now)
     end
   end
 end
@@ -141,12 +143,12 @@ In your Rails app, add (2.3.x):
 
 ```
   config.gem 'apn_sender', :lib => 'apn'
-``` 
+```
 or (3.x) to your Gemfile:
 
-```  
+```
   gem 'apn_sender', require: 'apn'
-```  
+```
 To add a few useful rake tasks for running workers, add the following line to your Rakefile:
 
 ```
