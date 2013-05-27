@@ -8,9 +8,15 @@ namespace :apn do
   task :sender => :setup do
     require 'apn'
 
-    worker = APN::Sender.new(:full_cert_path => ENV['FULL_CERT_PATH'], :cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'], :cert_pass => ENV['CERT_PASS'])
-    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
-    worker.very_verbose = ENV['VVERBOSE']
+#    worker = APN::Sender.new(:full_cert_path => ENV['FULL_CERT_PATH'], :cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'], :cert_pass => ENV['CERT_PASS'])
+#    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
+#    worker.very_verbose = ENV['VVERBOSE']
+
+    APN.password = ENV['CERT_PASS']
+    APN.full_certificate_path =  ENV['FULL_CERT_PATH']
+    APN.logger = Rails.logger
+
+    worker = ::Resque::Worker.new(APN::QUEUE_NAME)
 
     puts "*** Starting worker to send apple notifications in the background from #{worker}"
 

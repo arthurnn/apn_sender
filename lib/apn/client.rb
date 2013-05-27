@@ -1,16 +1,26 @@
 module APN
   class Client
 
+    DEFAULTS = {port: 2195, host: "gateway.push.apple.com"}
+
     def initialize(options = {})
-      defaults = {port: 2195, host: "gateway.push.apple.com"}
-      options = defaults.merge(options)
+      options = DEFAULTS.merge options.reject{|k,v| v.nil?}
       @apn_cert, @cert_pass = options[:certificate], options[:password]
       @host, @port = options[:host], options[:port]
       self
     end
 
     def push(message)
-      socket.write(message)
+      socket.write(message.to_s)
+      socket.flush
+      if IO.select([socket], nil, nil, 1) && error = socket.read(6)
+        error = error.unpack("ccN")
+        APN.log(:error, "Error on message: #{error}")
+        return false
+      end
+
+      APN.log(:debug, "Message sent.")
+      true
     end
 
     def socket
@@ -20,6 +30,16 @@ module APN
     private
     # Open socket to Apple's servers
     def setup_socket
+      ctx = setup_certificate
+
+      socket_tcp = TCPSocket.new(@host, @port)
+      OpenSSL::SSL::SSLSocket.new(socket_tcp, ctx).tap do |s|
+        s.sync = true
+        s.connect
+      end
+    end
+
+    def setup_certificate
       ctx = OpenSSL::SSL::SSLContext.new
       ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
       if @cert_pass
@@ -27,14 +47,7 @@ module APN
       else
         ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
       end
-
-      socket_tcp = TCPSocket.new(@host, @port)
-      OpenSSL::SSL::SSLSocket.new(socket_tcp, ctx).tap do |s|
-        s.sync = true
-        s.connect
-      end
-      #      rescue SocketError => error
-      #        log_and_die("Error with connection to #{apn_host}: #{error}")
+      ctx
     end
 
   end

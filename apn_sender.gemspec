@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = ">= 1.9"
   s.required_rubygems_version = ">= 1.3.6"
 
+  s.add_dependency("connection_pool", [">= 0"])
   s.add_dependency("resque", [">= 0"])
   s.add_dependency("activesupport", [">= 3.1"])
 

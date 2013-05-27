@@ -1,26 +1,44 @@
+require "openssl"
+require "socket"
+
 require "active_support/core_ext"
 require "active_support/json"
-require 'resque'
+require 'connection_pool'
+
+require "apn/version"
+require 'apn/connection'
 
 module APN
   QUEUE_NAME = :apple_push_notifications
-end
-require 'apn/notification'
-require 'apn/notification_job'
-require 'apn/connection'
-require 'apn/client'
-require 'apn/sender'
-require 'apn/feedback'
-
-module APN
 
   class << self
     include APN::Connection
 
     # Enqueues a notification to be sent in the background via the persistent TCP socket, assuming apn_sender is running (or will be soon)
-    def notify(token, opts = {})
+    def notify_async(token, opts = {})
       token = token.to_s.gsub(/\W/, '')
-      Resque.enqueue(APN::NotificationJob, token, opts)
+      if defined?(Resque)
+        Resque.enqueue(APN::NotificationJob, token, opts)
+      else
+        Thread.new do
+          APN.notify_sync(token, opts)
+        end
+      end
+    end
+
+    def notify(token, opts = {})
+      ## TODO : DEPRECATED
+      notify_async(token, opts)
+    end
+
+    def notify_sync(token, opts)
+      token = token.to_s.gsub(/\W/, '')
+      msg = APN::Notification.new(token, opts)
+      raise "Invalid notification options (did you provide :alert, :badge, or :sound?): #{opts.inspect}" unless msg.valid?
+
+      APN.with_connection do |client|
+        client.push(msg)
+      end
     end
 
     def logger=(logger)
@@ -38,12 +56,10 @@ module APN
     #
     # Perhaps a method definition of +message, +level+ would make more sense, but
     # that's also the complete opposite of what anyone comming from rails would expect.
-    alias_method(:resque_log, :log) if defined?(log)
     def log(level, message = nil)
       level, message = 'info', level if message.nil? # Handle only one argument if called from Resque, which expects only message
 
-      resque_log(message) if defined?(resque_log)
-      return false unless self.logger && self.logger.respond_to?(level)
+      return false unless logger && logger.respond_to?(level)
       logger.send(level, "#{Time.now}: #{message}")
     end
 
@@ -54,4 +70,20 @@ module APN
       raise msg
     end
   end
+end
+
+
+require 'apn/notification'
+require 'apn/client'
+require 'apn/feedback'
+
+if defined?(Resque)
+  require 'apn/notification_job'
+end
+
+if defined?(Rails)
+  APN.root = File.join(Rails.root, "config", "certs")
+  APN.certificate_name = Rails.env.development? ? "apn_development.pem" : "apn_production.pem"
+  logger = Logger.new(File.join(Rails.root, 'log', 'apn_sender.log'))
+  APN.logger = logger
 end

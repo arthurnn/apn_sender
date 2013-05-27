@@ -15,18 +15,14 @@ module APN
       connection_pool.with(&block)
     end
 
-    attr_accessor :root, :host, :port, :password, :full_certificate_path
-
-    def certificate_path
-      full_certificate_path ||
-        begin
-          path = File.join(File.expand_path(root), "config", "certs")
-          File.join(path, certificate_name)
-        end
-    end
+    attr_accessor :host, :port, :root, :full_certificate_path, :password
 
     def certificate
       @apn_cert ||= File.read(certificate_path)
+    end
+
+    def certificate_path
+      full_certificate_path || File.join(root, certificate_name)
     end
 
     def certificate_name
