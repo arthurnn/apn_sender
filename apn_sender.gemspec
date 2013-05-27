@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
 
   s.add_dependency("resque", [">= 0"])
-  s.add_dependency("resque-access_worker_from_job", [">= 0"])
   s.add_dependency("activesupport", [">= 3.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG LICENSE README.md Rakefile)

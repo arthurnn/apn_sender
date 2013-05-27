@@ -1,5 +1,3 @@
-require 'apn/connection/base'
-
 module APN
   # Encapsulates data returned from the {APN Feedback Service}[http://developer.apple.com/iphone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3].
   # Possesses +timestamp+ and +token+ attributes.
@@ -22,7 +20,7 @@ module APN
   #
   # See README for usage and details.
   class Feedback
-    include APN::Connection::Base
+#    include APN::Connection::Base
 
     # Returns array of APN::FeedbackItem elements read from Apple. Connects to Apple once and caches the
     # data, continues to returns cached data unless called with <code>data(true)</code>, which clears the

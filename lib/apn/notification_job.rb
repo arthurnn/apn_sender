@@ -14,11 +14,5 @@ module APN
       raise "APN::NotificationJob was picked up by a non-APN:Sender resque worker. Aborting." unless worker
       worker.send_to_apple(msg)
     end
-
-
-    # Only execute this job in specialized APN::Sender workers, since
-    # standard Resque workers don't maintain the persistent TCP connection.
-    extend Resque::Plugins::AccessWorkerFromJob
-    self.required_worker_class = 'APN::Sender'
   end
 end
