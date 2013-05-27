@@ -27,6 +27,25 @@ describe APN::Connection do
         MockConnection.certificate_path.should =~ /^#{Regexp.escape(root)}/
       end
     end
+
+    context "when changing the full_certificate_path" do
+
+      let(:path) do
+        File.expand_path File.join(File.dirname(__FILE__), '..', 'cert.pem')
+      end
+
+      before do
+        MockConnection.full_certificate_path = path
+      end
+
+      after do
+        MockConnection.full_certificate_path = nil
+      end
+
+      it "returns abosulute path" do
+        expect(MockConnection.certificate_path).to eq(path)
+      end
+    end
   end
 
   describe ".certificate_name" do

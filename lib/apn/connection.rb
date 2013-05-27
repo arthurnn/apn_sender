@@ -18,8 +18,11 @@ module APN
     attr_accessor :root, :host, :port, :password, :full_certificate_path
 
     def certificate_path
-      path = File.join(File.expand_path(root), "config", "certs")
-      full_certificate_path || File.join(path, certificate_name)
+      full_certificate_path ||
+        begin
+          path = File.join(File.expand_path(root), "config", "certs")
+          File.join(path, certificate_name)
+        end
     end
 
     def certificate
