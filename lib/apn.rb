@@ -81,9 +81,4 @@ if defined?(Resque)
   require 'apn/notification_job'
 end
 
-if defined?(Rails)
-  APN.root = File.join(Rails.root, "config", "certs")
-  APN.certificate_name = Rails.env.development? ? "apn_development.pem" : "apn_production.pem"
-  logger = Logger.new(File.join(Rails.root, 'log', 'apn_sender.log'))
-  APN.logger = logger
-end
+require "apn/railtie" if defined?(Rails)
