@@ -22,7 +22,7 @@ The apn_sender gem includes a background daemon which processes background messa
 Yup.  There's some great code out there already, but we didn't like the idea of getting banned from the APN gateway for establishing a new connection each time we needed to send a batch of messages, and none of the libraries I found handled maintaining a persistent connection.
 
 ## Current Status
-This gem has been in production on 500px,sending million of notifications.
+This gem has been used in production, on 500px, sending millions of notifications.
 
 ## Usage
 
@@ -31,7 +31,7 @@ This gem has been in production on 500px,sending million of notifications.
 To queue a message for sending through Apple's Push Notification service from your Rails application:
 
 ```
-APN.notify(token, opts_hash)
+APN.notify_async(token, opts_hash)
 ```
 
 where ```token``` is the unique identifier of the iPhone to receive the notification and ```opts_hash``` can have any of the following keys:
@@ -62,10 +62,9 @@ For production, you're probably better off running a dedicated daemon and settin
 ./script/generate apn_sender
 
  # To run daemon. Pass --help to print all options
-./script/apn_sender --environment#production --verbose start
+./script/apn_sender start
 ```
 
-Note the --environment must be explicitly set (separately from your <code>Rails.env</code>) to production in order to send messages via the production APN servers.  Any other environment sends messages through Apple's sandbox servers at <code>gateway.sandbox.push.apple.com</code>.
 
 Also, there are two similar options: ```:cert_path``` and ```:full_cert_path```.  The former specifies the directory in which to find the .pem file (either apn_production.pem or apn_development.pem, depending on the environment). The latter specifies a .pem file explicitly, allowing customized certificate names if needed.
 
@@ -81,9 +80,9 @@ It's actually really simple - you connect to them periodically and they give you
 ```
  # APN::Feedback accepts the same optional :environment
  # and :cert_path / :full_cert_path options as APN::Sender
- feedback # APN::Feedback.new()
+ feedback = APN::Feedback.new()
 
- tokens # feedback.tokens # #> Array of device tokens
+ tokens = feedback.tokens # Array of device tokens
  tokens.each do |token|
    # ... custom logic here to stop you app from
    # sending further notifications to this token
@@ -93,7 +92,7 @@ It's actually really simple - you connect to them periodically and they give you
 If you're interested in knowing exactly <em>when</em> Apple determined each token was expired (which can be useful in determining if the application re-registered with your service since it first appeared in the expired queue):
 
 ```
- items # feedback.data # #> Array of APN::FeedbackItem elements
+ items = feedback.data # Array of APN::FeedbackItem elements
  items.each do |item|
    item.token
    item.timestamp
@@ -113,15 +112,15 @@ If you're sending notifications, you should definitely call one of the ```receiv
 Just for the record, this is essentially what you want to have whenever run periodically for you:
 ```
 def self.clear_uninstalled_applications
-  feedback_data # APN::Feedback.new(:environment #> :production).data
+  feedback_data = APN::Feedback.new(:environment #> :production).data
 
   feedback_data.each do |item|
-    user # User.find_by_iphone_token( item.token )
+    user = User.find_by_iphone_token( item.token )
 
     if user.iphone_token_updated_at && user.iphone_token_updated_at > item.timestamp
       return true # App has been reregistered since Apple determined it'd been uninstalled
     else
-      user.update_attributes(:iphone_token #> nil, :iphone_token_updated_at #> Time.now)
+      user.update_attributes(iphone_token: nil, iphone_token_updated_at: Time.now)
     end
   end
 end
@@ -158,4 +157,4 @@ To add a few useful rake tasks for running workers, add the following line to yo
 
 ## Copyright
 
-Copyright (c) 2010 Kali Donovan. See LICENSE for details.
+Copyright (c) 2013 Arthur Nogueira Neves. See LICENSE for details.
