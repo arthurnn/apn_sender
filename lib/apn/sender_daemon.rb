@@ -14,7 +14,7 @@ module APN
   class SenderDaemon
 
     def initialize(args)
-      @options = {worker_count: 1, environment: :development, delay: 5}
+      @options = {worker_count: 1, delay: 5}
 
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: #{File.basename($0)} [options] start|stop|restart|run"
@@ -23,9 +23,6 @@ module APN
           puts opts
           exit 1
         end
-#        opts.on('-e', '--environment=NAME', 'Specifies the environment to run this apn_sender under ([development]/production).') do |e|
-#          @options[:environment] = e
-#        end
         opts.on('--cert-path=NAME', 'Path to directory containing apn .pem certificates.') do |path|
           @options[:cert_root] = path
         end
@@ -45,7 +42,6 @@ module APN
 
       # If no arguments, give help screen
       @args = optparse.parse!(args.empty? ? ['-h'] : args)
-      @options[:verbose] = true if @options[:very_verbose]
     end
 
     def daemonize

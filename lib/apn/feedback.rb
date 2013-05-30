@@ -20,7 +20,10 @@ module APN
   #
   # See README for usage and details.
   class Feedback
-#    include APN::Connection::Base
+
+    def initialize(options = {})
+      @apn_host, @apn_port = options[:host], options[:port]
+    end
 
     # Returns array of APN::FeedbackItem elements read from Apple. Connects to Apple once and caches the
     # data, continues to returns cached data unless called with <code>data(true)</code>, which clears the
@@ -43,7 +46,7 @@ module APN
 
     # Prettify to return meaningful status information when printed. Can't add these directly to connection/base, because Resque depends on decoding to_s
     def to_s
-      "#{@socket ? 'Connected' : 'Connection not currently established'} to #{apn_host} on #{apn_port}"
+      "#{@socket ? 'Connected' : 'Connection not currently established'} to #{host} on #{port}"
     end
 
     protected
@@ -51,31 +54,26 @@ module APN
     # Connects to Apple's Feedback Service and checks if there's anything there for us.
     # Returns an array of APN::FeedbackItem pairs
     def receive
-      feedback = []
-
-      # Hi Apple
-      setup_connection
-
-      # Unpacking code borrowed from http://github.com/jpoz/APNS/blob/master/lib/apns/core.rb
-      while bunch = socket.read(38)   # Read data from the socket
-        f = bunch.strip.unpack('N1n1H140')
-        feedback << APN::FeedbackItem.new(Time.at(f[0]), f[2])
+      feedbacks = []
+      while f = client.feedback
+        feedbacks << f
       end
-
-      # Bye Apple
-      teardown_connection
-
-      return feedback
+      return feedbacks
     end
 
-
-    def apn_host
-      @apn_host ||= apn_production? ? "feedback.push.apple.com" : "feedback.sandbox.push.apple.com"
+    def client
+      @client ||= APN::Client.new(host: host,
+                                  port: port,
+                                  certificate: APN.certificate,
+                                  password: APN.password)
     end
 
-    def apn_port
-      2196
+    def host
+      @apn_host || "feedback.push.apple.com"
     end
 
+    def port
+      @apn_port || 2196
+    end
   end
 end
