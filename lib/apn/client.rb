@@ -32,6 +32,8 @@ module APN
     def setup_socket
       ctx = setup_certificate
 
+      APN.log(:debug, "Connecting to #{@host}:#{@port}...")
+
       socket_tcp = TCPSocket.new(@host, @port)
       OpenSSL::SSL::SSLSocket.new(socket_tcp, ctx).tap do |s|
         s.sync = true
@@ -44,6 +46,8 @@ module APN
       ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
       if @cert_pass
         ctx.key = OpenSSL::PKey::RSA.new(@apn_cert, @cert_pass)
+        APN.log(:debug, "Setting up certificate using a password.")
+
       else
         ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
       end

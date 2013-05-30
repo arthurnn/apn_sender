@@ -27,7 +27,7 @@ module APN
     end
 
     def notify(token, opts = {})
-      ## TODO : DEPRECATED
+      warn ".notify method is deprecated and will be removed in the next release. Please use notify_async instead."
       notify_async(token, opts)
     end
 
@@ -71,7 +71,6 @@ module APN
     end
   end
 end
-
 
 require 'apn/notification'
 require 'apn/client'

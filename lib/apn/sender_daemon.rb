@@ -38,12 +38,6 @@ module APN
         opts.on('-n', '--number-of-workers=WORKERS', "Number of unique workers to spawn") do |worker_count|
           @options[:worker_count] = worker_count.to_i rescue 1
         end
-#        opts.on('-v', '--verbose', "Turn on verbose mode") do
-#          @options[:verbose] = true
-#        end
-#        opts.on('-V', '--very-verbose', "Turn on very verbose mode") do
-#          @options[:very_verbose] = true
-#        end
         opts.on('-d', '--delay=D', "Delay between rounds of work (seconds)") do |d|
           @options[:delay] = d
         end
@@ -67,7 +61,7 @@ module APN
       APN.password = @options[:cert_pass]
       APN.full_certificate_path = @options[:full_cert_path]
       APN.root = @options[:cert_root]
-      APN.logger = logger
+      APN.logger = Rails.logger
 
       worker = ::Resque::Worker.new(APN::QUEUE_NAME)
       worker.work(@options[:delay])
