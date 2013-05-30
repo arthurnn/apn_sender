@@ -23,14 +23,17 @@ module APN
           puts opts
           exit 1
         end
-        opts.on('--cert-path=NAME', 'Path to directory containing apn .pem certificates.') do |path|
+        opts.on('--cert-path=PATH', 'Path to directory containing apn .pem certificates.') do |path|
           @options[:cert_root] = path
         end
-        opts.on('c', '--full-cert-path=NAME', 'Full path to desired .pem certificate (overrides environment selector).') do |path|
+        opts.on('c', '--full-cert-path=PATH', 'Full path to desired .pem certificate.') do |path|
           @options[:full_cert_path] = path
         end
         opts.on('--cert-pass=PASSWORD', 'Password for the apn .pem certificates.') do |pass|
           @options[:cert_pass] = pass
+        end
+        opts.on('--cert-name=NAME', 'Certificate file name. Default: apn_production.pem') do |certificate_name|
+          @options[:certificate_name] = certificate_name
         end
         opts.on('-n', '--number-of-workers=WORKERS', "Number of unique workers to spawn") do |worker_count|
           @options[:worker_count] = worker_count.to_i rescue 1
@@ -47,7 +50,8 @@ module APN
     def daemonize
       @options[:worker_count].times do |worker_index|
         process_name = @options[:worker_count] == 1 ? "apn_sender" : "apn_sender.#{worker_index}"
-        Daemons.run_proc(process_name, :dir => "#{::RAILS_ROOT}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
+        pids_dir = if defined?(Rails) ? "#{::RAILS_ROOT}/tmp/pids" : "tmp/pids"
+        Daemons.run_proc(process_name, :dir => pids_dir, :dir_mode => :normal, :ARGV => @args) do |*args|
           run(process_name)
         end
       end
@@ -57,7 +61,7 @@ module APN
       APN.password = @options[:cert_pass]
       APN.full_certificate_path = @options[:full_cert_path]
       APN.root = @options[:cert_root]
-      APN.logger = Rails.logger
+      APN.certificate_name = @options[:certificate_name]
 
       worker = ::Resque::Worker.new(APN::QUEUE_NAME)
       worker.work(@options[:delay])
