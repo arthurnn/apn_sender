@@ -3,7 +3,7 @@ module APN
     # APN::Connection::Base takes care of all the boring certificate loading, socket creating, and logging
     # responsibilities so APN::Sender and APN::Feedback and focus on their respective specialties.
     def connection_pool
-      @pool ||= ConnectionPool.new(size: 1, timeout: 5) do
+      @pool ||= ConnectionPool.new(size: (pool_size || 1), timeout: (pool_timeout || 5)) do
         APN::Client.new(host: host,
                         port: port,
                         certificate: certificate,
@@ -14,6 +14,9 @@ module APN
     def with_connection(&block)
       connection_pool.with(&block)
     end
+
+    # pool config
+    attr_accessor :pool_size, :pool_timeout
 
     attr_accessor :host, :port, :root, :full_certificate_path, :password
 
