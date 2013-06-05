@@ -17,8 +17,10 @@ module APN
     # Enqueues a notification to be sent in the background via the persistent TCP socket, assuming apn_sender is running (or will be soon)
     def notify_async(token, opts = {})
       token = token.to_s.gsub(/\W/, '')
-      if defined?(Resque)
-        Resque.enqueue(APN::NotificationJob, token, opts)
+      if defined?(Sidekiq)
+        Sidekiq::Client.enqueue(APN::Jobs::SidekiqNotificationJob, token, opts)
+      elsif defined?(Resque)
+        Resque.enqueue(APN::Jobs::ResqueNotificationJob, token, opts)
       else
         Thread.new do
           APN.notify_sync(token, opts)
@@ -76,8 +78,10 @@ require 'apn/notification'
 require 'apn/client'
 require 'apn/feedback'
 
-if defined?(Resque)
-  require 'apn/notification_job'
+if defined?(Sidekiq)
+  require 'apn/jobs/sidekiq_notification_job'
+elsif defined?(Resque)
+  require 'apn/jobs/resque_notification_job'
 end
 
 require "apn/railtie" if defined?(Rails)
