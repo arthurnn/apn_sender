@@ -22,6 +22,6 @@ Gem::Specification.new do |s|
   s.add_dependency("resque", [">= 0"])
   s.add_dependency("activesupport", [">= 3.1"])
 
-  s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG LICENSE README.md Rakefile)
+  s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.require_path = 'lib'
 end
