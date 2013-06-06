@@ -16,15 +16,7 @@ module APN
 
     def notify_async(token, opts = {})
       token = token.to_s.gsub(/\W/, '')
-      if defined?(Sidekiq)
-        Sidekiq::Client.enqueue(APN::Jobs::SidekiqNotificationJob, token, opts)
-      elsif defined?(Resque)
-        Resque.enqueue(APN::Jobs::ResqueNotificationJob, token, opts)
-      else
-        Thread.new do
-          APN.notify_sync(token, opts)
-        end
-      end
+      backend.notify(token, opts)
     end
 
     def notify_sync(token, opts)
@@ -35,6 +27,21 @@ module APN
       APN.with_connection do |client|
         client.push(msg)
       end
+    end
+
+    def backend=(backend)
+      @backend = backend
+    end
+
+    def backend
+      @backend ||=
+        if defined?(Sidekiq)
+          APN::Backend::Sidekiq.new
+        elsif defined?(Resque)
+          APN::Backend::Resque.new
+        else
+          APN::Backend::Simple.new
+        end
     end
 
     def logger=(logger)
