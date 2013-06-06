@@ -14,7 +14,6 @@ module APN
   class << self
     include APN::Connection
 
-    # Enqueues a notification to be sent in the background via the persistent TCP socket, assuming apn_sender is running (or will be soon)
     def notify_async(token, opts = {})
       token = token.to_s.gsub(/\W/, '')
       if defined?(Sidekiq)
@@ -26,11 +25,6 @@ module APN
           APN.notify_sync(token, opts)
         end
       end
-    end
-
-    def notify(token, opts = {})
-      warn ".notify method is deprecated and will be removed in the next release. Please use notify_async instead."
-      notify_async(token, opts)
     end
 
     def notify_sync(token, opts)
