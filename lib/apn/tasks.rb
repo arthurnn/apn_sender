@@ -8,9 +8,10 @@ namespace :apn do
   task :sender => :setup do
     require 'apn'
 
-#    worker = APN::Sender.new(:full_cert_path => ENV['FULL_CERT_PATH'], :cert_path => ENV['CERT_PATH'], :environment => ENV['ENVIRONMENT'], :cert_pass => ENV['CERT_PASS'])
-#    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
-#    worker.very_verbose = ENV['VVERBOSE']
+    unless defined?(Resque)
+      puts "This rake task is only for resque workers"
+      return
+    end
 
     APN.password = ENV['CERT_PASS']
     APN.full_certificate_path =  ENV['FULL_CERT_PATH']

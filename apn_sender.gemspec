@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.version = APN::VERSION
   s.authors = ["Kali Donovan", "Arthur Neves"]
   s.date = %q{2011-05-15}
-  s.summary = "Resque-based background worker to send Apple Push Notifications over a persistent TCP socket."
-  s.description = "Resque-based background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them."
+  s.summary = "Background worker to send Apple Push Notifications over a persistent TCP socket."
+  s.description = "Background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them."
   s.email = %q{arthurnn@gmail.com}
   s.homepage = "http://github.com/arthurnn/apn_sender"
   s.license = "MIT"
@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
 
   s.add_dependency("connection_pool", [">= 0"])
-  s.add_dependency("resque", [">= 0"])
   s.add_dependency("activesupport", [">= 3.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)

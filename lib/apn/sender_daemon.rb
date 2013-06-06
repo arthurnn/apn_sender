@@ -3,6 +3,7 @@ require 'rubygems'
 require 'daemons'
 require 'optparse'
 require 'logger'
+require 'resque'
 
 module APN
   # A wrapper designed to daemonize an APN::Sender instance to keep in running in the background.
