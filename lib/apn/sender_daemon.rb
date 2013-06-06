@@ -63,7 +63,7 @@ module APN
       APN.root = @options[:cert_root]
       APN.certificate_name = @options[:certificate_name]
 
-      worker = ::Resque::Worker.new(APN::QUEUE_NAME)
+      worker = ::Resque::Worker.new(APN::Jobs::QUEUE_NAME)
       worker.work(@options[:delay])
     rescue => e
       STDERR.puts e.message

@@ -5,7 +5,7 @@ module APN::Jobs
   class SidekiqNotificationJob
     include Sidekiq::Worker
     # Behind the scenes, this is the name of our Sidekiq queue
-    @queue = APN::QUEUE_NAME
+    @queue = QUEUE_NAME
 
     # Build a notification from arguments and send to Apple
     def perform(token, opts)

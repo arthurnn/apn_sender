@@ -1,6 +1,5 @@
 require "openssl"
 require "socket"
-
 require "active_support/core_ext"
 require "active_support/json"
 require 'connection_pool'
@@ -9,7 +8,6 @@ require "apn/version"
 require 'apn/connection'
 
 module APN
-  QUEUE_NAME = :apple_push_notifications
 
   class << self
     include APN::Connection
@@ -87,10 +85,10 @@ require 'apn/notification'
 require 'apn/client'
 require 'apn/feedback'
 
-if defined?(Sidekiq)
-  require 'apn/jobs/sidekiq_notification_job'
-elsif defined?(Resque)
-  require 'apn/jobs/resque_notification_job'
+module APN::Jobs
+  QUEUE_NAME = :apple_push_notifications
 end
 
+require 'apn/jobs/sidekiq_notification_job' if defined?(Sidekiq)
+require 'apn/jobs/resque_notification_job' if defined?(Resque)
 require "apn/railtie" if defined?(Rails)

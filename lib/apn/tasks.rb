@@ -16,7 +16,7 @@ namespace :apn do
     APN.full_certificate_path =  ENV['FULL_CERT_PATH']
     APN.logger = Rails.logger
 
-    worker = ::Resque::Worker.new(APN::QUEUE_NAME)
+    worker = ::Resque::Worker.new(APN::Jobs::QUEUE_NAME)
 
     puts "*** Starting worker to send apple notifications in the background from #{worker}"
 
