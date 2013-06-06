@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = ">= 1.9"
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.add_dependency("resque", [">= 0"])
+  s.add_dependency("resque", ["<= 1.19.0"])
   s.add_dependency("resque-access_worker_from_job", [">= 0"])
   s.add_dependency("active_support", [">= 0"])
 
