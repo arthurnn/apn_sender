@@ -1,11 +1,11 @@
 require 'spec_helper'
 describe APN::Notification do
 
-  describe ".packaged_message" do
+  let(:notification) do
+    APN::Notification.new('token', payload)
+  end
 
-    let(:notification) do
-      APN::Notification.new('token', payload)
-    end
+  describe ".packaged_message" do
 
     let(:message) do
       notification.packaged_message
@@ -50,5 +50,29 @@ describe APN::Notification do
 
   describe ".packaged_token" do
     pending
+  end
+
+  describe ".truncate_alert!" do
+    APN.truncate_alert = true
+
+    context "when alert is a string" do
+      let(:payload) do
+        { alert: ("a" * 300) }
+      end
+
+      it "should truncate the alert" do
+        notification.packaged_notification.size.to_i.should == 256
+      end
+    end
+
+    context "when payload is a hash" do
+      let(:payload) do
+        { alert: { 'loc-args' => ["a" * 300] }}
+      end
+
+      it "should truncate the alert" do
+        notification.packaged_notification.size.to_i.should == 256
+      end
+    end
   end
 end

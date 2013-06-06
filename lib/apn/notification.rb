@@ -22,11 +22,14 @@ module APN
     # Each iPhone Notification payload must be 256 or fewer characters.  Encoding a null message has a 57
     # character overhead, so there are 199 characters available for the alert string.
     MAX_ALERT_LENGTH = 199
+    DATA_MAX_BYTES = 256
 
     attr_accessor :options, :token
     def initialize(token, opts)
       @options = opts.is_a?(Hash) ? opts.symbolize_keys : {:alert => opts}
       @token = token
+
+      truncate_alert! if APN.truncate_alert
 
       raise "The maximum size allowed for a notification payload is 256 bytes." if packaged_notification.size.to_i > 256
     end
@@ -69,6 +72,17 @@ module APN
       end
       hsh.merge!(opts)
       ActiveSupport::JSON::encode(hsh)
+    end
+
+    def truncate_alert!
+      while packaged_notification.size.to_i > DATA_MAX_BYTES
+        if @options[:alert].is_a? Hash
+          last = @options[:alert]['loc-args'].pop
+          @options[:alert]['loc-args'] << last[0..-2]
+        else
+          @options[:alert] = @options[:alert][0..-2]
+        end
+      end
     end
   end
 end

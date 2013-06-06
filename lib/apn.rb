@@ -51,6 +51,14 @@ module APN
       @logger ||= Logger.new(STDOUT)
     end
 
+    def truncate_alert
+      @truncate_alert ||= false
+    end
+
+    def truncate_alert=(truncate)
+      @truncate_alert = truncate
+    end
+
     # Log message to any logger provided by the user (e.g. the Rails logger).
     # Accepts +log_level+, +message+, since that seems to make the most sense,
     # and just +message+, to be compatible with Resque's log method and to enable
