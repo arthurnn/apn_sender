@@ -11,7 +11,7 @@ module APN
     class Resque
 
       def notify(token, opts)
-        Resque.enqueue(APN::Jobs::ResqueNotificationJob, token, opts)
+        ::Resque.enqueue(APN::Jobs::ResqueNotificationJob, token, opts)
       end
     end
 
