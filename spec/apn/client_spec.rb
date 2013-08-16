@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe APN::Client do
 
-  let(:socket) { mock("SSLSocket") }
+  let(:socket) { double("SSLSocket") }
 
   describe ".push" do
 
@@ -10,7 +10,7 @@ describe APN::Client do
     end
 
     before do
-      client.should_receive(:socket).any_number_of_times.and_return(socket)
+      expect(client).to receive(:socket).at_least(1).and_return(socket)
       IO.should_receive(:select).and_return(false)
     end
 
