@@ -13,6 +13,7 @@ module APN
     def push(message)
       socket.write(message.to_s)
       socket.flush
+
       if IO.select([socket], nil, nil, 1) && error = socket.read(6)
         error = error.unpack("ccN")
         APN.log(:error, "Error on message: #{error}")
@@ -21,6 +22,11 @@ module APN
 
       APN.log(:debug, "Message sent.")
       true
+    rescue OpenSSL::SSL::SSLError, Errno::EPIPE => e
+      APN.log(:error, "[##{self.object_id}] Exception occurred: #{e.inspect}, socket state: #{socket.inspect}")
+      reset_socket
+      APN.log(:debug, "[##{self.object_id}] Socket reestablished, socket state: #{socket.inspect}")
+      retry
     end
 
     def feedback
@@ -35,6 +41,7 @@ module APN
     end
 
     private
+
     # Open socket to Apple's servers
     def setup_socket
       ctx = setup_certificate
@@ -46,6 +53,12 @@ module APN
         s.sync = true
         s.connect
       end
+    end
+
+    def reset_socket
+      @socket.close if @socket
+      @socket = nil
+      socket
     end
 
     def setup_certificate
