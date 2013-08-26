@@ -153,4 +153,4 @@ To add a few useful rake tasks for running workers, add the following line to yo
 
 ## License
 
-APN Sender is released under the MIT License.
+APN Sender is released under the [MIT License](http://www.opensource.org/licenses/MIT).
