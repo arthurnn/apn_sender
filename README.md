@@ -13,16 +13,16 @@ Need to send background notifications to an iPhone application over a <em>persis
 
 ## The Story
 
-So you're building the server component of an iPhone application in Ruby.  And you want to send background notifications through the Apple Push Notification servers, which doesn't seem too bad at first.  But then you read in the [Apple Documentation](https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Introduction.html) that Apple's servers may treat non-persistent connections as a Denial of Service attack, and you realize that Rails has no easy way to maintain a persistent connection internally, and things start looking more complicated.
+So you're building the server component of an iPhone application in Ruby and you want to send background notifications through the Apple Push Notification servers. This doesn't seem too bad at first, but then you read in the [Apple Documentation](https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Introduction.html) that Apple's servers may treat non-persistent connections as a Denial of Service attack. Since Rails has no easy way to maintain a persistent connection internally, things start to look complicated.
 
-The apn_sender gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes the ability to query the Feedback service, helper methods for enqueueing your jobs, and a sample monit config to make sure the background worker is around when you need it.
+This gem includes a background daemon which processes background messages from your application and sends them along to Apple <em>over a single, persistent socket</em>.  It also includes the ability to query the Feedback service, helper methods for enqueueing your jobs, and a sample monit config to make sure the background worker is around when you need it.
 
 ## Yet another ApplePushNotification interface?
 
 Yup.  There's some great code out there already, but we didn't like the idea of getting banned from the APN gateway for establishing a new connection each time we needed to send a batch of messages, and none of the libraries I found handled maintaining a persistent connection.
 
 ## Current Status
-This gem has been used in production, on 500px, sending millions of notifications.
+This gem has been used in production, on 500px, sending hundreds of millions, if not, billions of notifications.
 
 ## Usage
 
@@ -34,14 +34,11 @@ To queue a message for sending through Apple's Push Notification service from yo
 APN.notify_async(token, opts_hash)
 ```
 
-where ```token``` is the unique identifier of the iPhone to receive the notification and ```opts_hash``` can have any of the following keys:
-
-Options:
+Where ```token``` is the unique identifier of the iPhone to receive the notification and ```opts_hash``` can have any of the following keys:
 
 * :alert  ## The alert to send
 * :badge  ## The badge number to send
 * :sound  ## The sound file to play on receipt, or true to play the default sound installed with your app
-
 
 If any other keys are present they'll be be passed along as custom data to your application.
 
@@ -64,7 +61,6 @@ For production, you're probably better off running a dedicated daemon and settin
  # To run daemon. Pass --help to print all options
 ./script/apn_sender start
 ```
-
 
 Also, there are two similar options: ```:cert_path``` and ```:full_cert_path```.  The former specifies the directory in which to find the .pem file (either apn_production.pem or apn_development.pem, depending on the environment). The latter specifies a .pem file explicitly, allowing customized certificate names if needed.
 
