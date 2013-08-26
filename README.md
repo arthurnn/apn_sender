@@ -151,6 +151,6 @@ To add a few useful rake tasks for running workers, add the following line to yo
   require 'apn/tasks'
 ```
 
-## Copyright
+## License
 
-Copyright (c) 2013 Arthur Nogueira Neves. See LICENSE for details.
+APN Sender is released under the MIT License.
