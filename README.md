@@ -1,12 +1,6 @@
 [![Code Climate](https://codeclimate.com/github/arthurnn/apn_sender.png)](https://codeclimate.com/github/arthurnn/apn_sender)
 [![Build Status](https://travis-ci.org/arthurnn/apn_sender.png)](https://travis-ci.org/arthurnn/apn_sender)
 
-## UPDATE May 3, 2013: current status
-
-This project was not supported for a while, but we are going to support it again.
-
------
-
 ## Synopsis
 
 Need to send background notifications to an iPhone application over a <em>persistent</em> connection in Ruby? Keep reading...
