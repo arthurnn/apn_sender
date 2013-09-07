@@ -16,9 +16,12 @@ This gem includes a background daemon which processes background messages from y
 Yup.  There's some great code out there already, but we didn't like the idea of getting banned from the APN gateway for establishing a new connection each time we needed to send a batch of messages, and none of the libraries I found handled maintaining a persistent connection.
 
 ## Current Status
-This gem has been used in production, on 500px, sending hundreds of millions, if not, billions of notifications.
+
+This gem has been used in production, on [500px](http://500px.com), sending hundreds of millions, if not, billions of notifications.
 
 ## Usage
+
+APN sender can use [Resque](http://github.com/defunkt/resque) or Sidekiq to send asynchronous messages, if none of them are installed it creates a new thread to send messages.
 
 ### 1. Queueing Messages From Your Application
 
@@ -124,21 +127,18 @@ There's also an included sample ```apn_sender.monitrc``` file in the ```contrib/
 
 ## Installation
 
-APN is built on top of [Resque](http://github.com/defunkt/resque) (an awesome [Redis](http://code.google.com/p/redis/)-based background runner similar to [delayed_job](http://github.com/collectiveidea/delayed_job)). Read through the [Resque README](http://github.com/defunkt/resque#readme) to get a feel for what's going on, follow the installation instructions there, and then run:
+Add this line to your application's Gemfile:
 
-```
-  $ gem install apn_sender
-```
-In your Rails app, add (2.3.x):
+    gem 'apn_sender', require: 'apn'
 
-```
-  config.gem 'apn_sender', :lib => 'apn'
-```
-or (3.x) to your Gemfile:
+And then execute:
 
-```
-  gem 'apn_sender', require: 'apn'
-```
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install apn_sender
+
 To add a few useful rake tasks for running workers, add the following line to your Rakefile:
 
 ```
