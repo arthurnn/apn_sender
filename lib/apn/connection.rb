@@ -1,7 +1,6 @@
 module APN
   module Connection
-    # APN::Connection::Base takes care of all the boring certificate loading, socket creating, and logging
-    # responsibilities so APN::Sender and APN::Feedback and focus on their respective specialties.
+
     def connection_pool
       @pool ||= ConnectionPool.new(size: (pool_size || 1), timeout: (pool_timeout || 5)) do
         APN::Client.new(host: host,

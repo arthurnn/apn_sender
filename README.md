@@ -21,9 +21,13 @@ This gem has been used in production, on [500px](http://500px.com), sending hund
 
 ## Usage
 
-APN sender can use [Resque](http://github.com/defunkt/resque) or Sidekiq to send asynchronous messages, if none of them are installed it creates a new thread to send messages.
+APN sender can use [Resque](http://github.com/defunkt/resque) or [Sidekiq](https://github.com/mperham/sidekiq) to send asynchronous messages, if none of them are installed it creates a new thread to send messages.
 
-### 1. Queueing Messages From Your Application
+### 1. Use a background processor or not.
+
+You can either use Resque or Sidekiq, I strongly advice using Sidekiq, as apn_sender uses a connection pool for the apple socks. To use apn_snder with one of them you dont have to do anything, just include the background processor gem into your gemfile and it will all work. 
+
+### 2. Queueing Messages From Your Application
 
 To queue a message for sending through Apple's Push Notification service from your Rails application:
 
@@ -39,32 +43,25 @@ Where ```token``` is the unique identifier of the iPhone to receive the notifica
 
 If any other keys are present they'll be be passed along as custom data to your application.
 
-### 2. Sending Queued Messages
+### 3. Sending Queued Messages
 
 Put your ```apn_development.pem``` and ```apn_production.pem``` certificates from Apple in your ```RAILS_ROOT/config/certs``` directory.
 
-Once this is done, you can fire off a background worker with
+You also can configure some extra settings:
 
 ```
-$ rake apn:sender
+APN.root = 'RAILS_ROOT/config/certs' # root to certificates folder
+APN.certificate_name = 'apn_production.pem' # certificate filename
+APN.host = 'apple host (on development sandbox url is used by default)'
+APN.passowrd = 'certificate_password'
+APN.pool_size = 1 # number of connections on the pool
+APN.pool_timout = 5 # timeout in seconds for connection pool
 ```
-
-For production, you're probably better off running a dedicated daemon and setting up monit to watch over it for you.  Luckily, that's pretty easy:
-
-```
- # To generate daemon
-./script/generate apn_sender
-
- # To run daemon. Pass --help to print all options
-./script/apn_sender start
-```
-
-Also, there are two similar options: ```:cert_path``` and ```:full_cert_path```.  The former specifies the directory in which to find the .pem file (either apn_production.pem or apn_development.pem, depending on the environment). The latter specifies a .pem file explicitly, allowing customized certificate names if needed.
 
 Check ```logs/apn_sender.log``` for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
 
 
-### 3. Checking Apple's Feedback Service
+### 4. Checking Apple's Feedback Service
 
 Since push notifications are a fire-and-forget sorta deal, where you get no indication if your message was received (or if the specified recipient even exists), Apple needed to come up with some other way to ensure their network isn't clogged with thousands of bogus messages (e.g. from developers sending messages to phones where their application <em>used</em> to be installed, but where the user has since removed it).  Hence, the Feedback Service.
 
