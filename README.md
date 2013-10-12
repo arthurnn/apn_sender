@@ -53,9 +53,9 @@ You also can configure some extra settings:
 APN.root = 'RAILS_ROOT/config/certs' # root to certificates folder
 APN.certificate_name = 'apn_production.pem' # certificate filename
 APN.host = 'apple host (on development sandbox url is used by default)'
-APN.passowrd = 'certificate_password'
+APN.password = 'certificate_password'
 APN.pool_size = 1 # number of connections on the pool
-APN.pool_timout = 5 # timeout in seconds for connection pool
+APN.pool_timeout = 5 # timeout in seconds for connection pool
 ```
 
 Check ```logs/apn_sender.log``` for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
