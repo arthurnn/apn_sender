@@ -89,8 +89,5 @@ module APN::Jobs
   QUEUE_NAME = :apple_push_notifications
 end
 
-require 'apn/jobs/sidekiq_notification_job' if defined?(Sidekiq)
-require 'apn/jobs/resque_notification_job' if defined?(Resque)
 require "apn/railtie" if defined?(Rails)
-
 require 'apn/backend'
