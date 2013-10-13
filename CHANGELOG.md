@@ -1,4 +1,7 @@
 # Version 2.0
+## 2.0.1
+- Rescuing and repairing broken connections (Arseniy Ivanov)
+
 ## 2.0.0
 - adding connection_pool for handle apple sockets
 - removing resque hard dependency
