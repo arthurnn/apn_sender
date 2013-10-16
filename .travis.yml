@@ -4,3 +4,7 @@ rvm:
   - 1.9.3
   - 2.0.0
 script: rspec spec
+gemfile:
+  - Gemfile
+  - Gemfile.sidekiq
+  - Gemfile.resque
