@@ -20,7 +20,7 @@ pkg
 .rvmrc
 
 # don't commit Gemfile.lock
-Gemfile.lock
+*.lock
 *.gem
 
 # rdoc generated
