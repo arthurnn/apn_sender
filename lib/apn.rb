@@ -34,8 +34,10 @@ module APN
     def backend
       @backend ||=
         if defined?(Sidekiq)
+          require 'apn/jobs/sidekiq_notification_job'
           APN::Backend::Sidekiq.new
         elsif defined?(Resque)
+          require 'apn/jobs/resque_notification_job'
           APN::Backend::Resque.new
         else
           APN::Backend::Simple.new

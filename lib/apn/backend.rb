@@ -1,4 +1,3 @@
-require 'apn/jobs'
 module APN
   module Backend
 
