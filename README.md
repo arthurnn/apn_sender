@@ -145,3 +145,7 @@ To add a few useful rake tasks for running workers, add the following line to yo
 ## License
 
 APN Sender is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arthurnn/apn_sender/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
