@@ -19,9 +19,8 @@ module APN
   #
   class Notification
     # Available to help clients determine before they create the notification if their message will be too large.
-    # Each iPhone Notification payload must be 256 or fewer characters.  Encoding a null message has a 57
-    # character overhead, so there are 199 characters available for the alert string.
-    MAX_ALERT_LENGTH = 199
+    # Each iPhone Notification payload must be 256 or fewer characters (not including the token or other push data), see Apple specs at:
+    # https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4
     DATA_MAX_BYTES = 256
 
     attr_accessor :options, :token
@@ -31,7 +30,7 @@ module APN
 
       truncate_alert! if APN.truncate_alert
 
-      raise "The maximum size allowed for a notification payload is 256 bytes." if packaged_notification.size.to_i > 256
+      raise "The maximum size allowed for a notification payload is #{DATA_MAX_BYTES} bytes." if packaged_message.size.to_i > DATA_MAX_BYTES
     end
 
     def to_s
@@ -75,7 +74,7 @@ module APN
     end
 
     def truncate_alert!
-      while packaged_notification.size.to_i > DATA_MAX_BYTES
+      while packaged_message.size.to_i > DATA_MAX_BYTES
         if @options[:alert].is_a? Hash
           last = @options[:alert]['loc-args'].pop
           @options[:alert]['loc-args'] << last[0..-2]

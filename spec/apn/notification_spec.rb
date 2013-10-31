@@ -61,7 +61,7 @@ describe APN::Notification do
       end
 
       it "should truncate the alert" do
-        notification.packaged_notification.size.to_i.should == 256
+        notification.packaged_message.size.to_i.should == APN::Notification::DATA_MAX_BYTES
       end
     end
 
@@ -71,7 +71,7 @@ describe APN::Notification do
       end
 
       it "should truncate the alert" do
-        notification.packaged_notification.size.to_i.should == 256
+        notification.packaged_message.size.to_i.should == APN::Notification::DATA_MAX_BYTES
       end
     end
   end
