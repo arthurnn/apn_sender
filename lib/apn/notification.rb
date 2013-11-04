@@ -28,13 +28,15 @@ module APN
       @options = opts.is_a?(Hash) ? opts.symbolize_keys : {:alert => opts}
       @token = token
 
-      truncate_alert! if APN.truncate_alert
-
-      raise "The maximum size allowed for a notification payload is #{DATA_MAX_BYTES} bytes." if packaged_message.size.to_i > DATA_MAX_BYTES
+      raise "The maximum size allowed for a notification payload is #{DATA_MAX_BYTES} bytes." if payload_size > DATA_MAX_BYTES
     end
 
     def to_s
       packaged_notification
+    end
+
+    def payload_size
+      packaged_message.bytesize
     end
 
     # Ensures at least one of <code>%w(alert badge sound)</code> is present
@@ -47,7 +49,7 @@ module APN
     def packaged_notification
       pt = packaged_token
       pm = packaged_message
-      [0, 0, 32, pt, 0, pm.bytesize, pm].pack("ccca*cca*")
+      [0, 0, 32, pt, 0, payload_size, pm].pack("ccca*cca*")
     end
 
     # Device token, compressed and hex-ified
@@ -59,29 +61,58 @@ module APN
     # Extracts :alert, :badge, and :sound keys into the 'aps' hash, merges any other hash data
     # into the root of the hash to encode and send to apple.
     def packaged_message
-      opts = @options.clone # Don't destroy our pristine copy
-      hsh = {'aps' => {}}
-      if alert = opts.delete(:alert)
-        alert = alert.to_s unless alert.is_a?(Hash)
-        hsh['aps']['alert'] = alert
-      end
-      hsh['aps']['badge'] = opts.delete(:badge).to_i if opts[:badge]
-      if sound = opts.delete(:sound)
-        hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
-      end
-      hsh.merge!(opts)
-      ActiveSupport::JSON::encode(hsh)
+      @packaged_message ||=
+        begin
+          opts = @options.dup
+          hsh = {'aps' => {}}
+          if alert = opts.delete(:alert)
+            alert = alert.to_s unless alert.is_a?(Hash)
+            hsh['aps']['alert'] = alert
+          end
+          hsh['aps']['badge'] = opts.delete(:badge).to_i if opts[:badge]
+          if sound = opts.delete(:sound)
+            hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
+          end
+          hsh.merge!(opts)
+          payload(hsh)
+        end
     end
 
-    def truncate_alert!
-      while packaged_message.size.to_i > DATA_MAX_BYTES
-        if @options[:alert].is_a? Hash
-          last = @options[:alert]['loc-args'].pop
-          @options[:alert]['loc-args'] << last[0..-2]
+    private
+
+    def payload(hash)
+      str = ActiveSupport::JSON::encode(hash)
+
+      if APN.truncate_alert && str.bytesize > DATA_MAX_BYTES
+        if hash['aps']['alert'].is_a?(Hash)
+          alert = hash['aps']['alert']['loc-args'][0]
         else
-          @options[:alert] = @options[:alert][0..-2]
+          alert = hash['aps']['alert']
+        end
+        max_bytesize = DATA_MAX_BYTES - (str.bytesize - alert.bytesize)
+
+        raise "Even truncating the alert wont be enought to have a #{DATA_MAX_BYTES} message" if max_bytesize <= 0
+        alert = truncate_alert(alert, max_bytesize)
+
+        if hash['aps']['alert'].is_a?(Hash)
+          hash['aps']['alert']['loc-args'][0] = alert
+        else
+          hash['aps']['alert'] = alert
+        end
+        str = ActiveSupport::JSON::encode(hash)
+      end
+      str
+    end
+
+    def truncate_alert(alert, max_size)
+      alert.each_char.each_with_object('') do |char, result|
+        if result.bytesize + char.bytesize > max_size
+          break result
+        else
+          result << char
         end
       end
     end
+
   end
 end
