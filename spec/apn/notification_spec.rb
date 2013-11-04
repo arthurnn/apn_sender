@@ -53,7 +53,13 @@ describe APN::Notification do
   end
 
   describe ".truncate_alert!" do
-    APN.truncate_alert = true
+
+    before do
+      APN.truncate_alert = true
+    end
+    after do
+      APN.truncate_alert = false
+    end
 
     context "when alert is a string" do
       let(:payload) do
