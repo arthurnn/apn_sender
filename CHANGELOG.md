@@ -1,5 +1,8 @@
 # Version 2.0
 ## 2.0.1
+- Use bytesize to truncate alert when necessary
+- Better calculation on payload size. (botvinik)
+- Fix generating payload should use bytesize. (piotr-sokolowski)
 - Rescuing and repairing broken connections (Arseniy Ivanov)
 
 ## 2.0.0
