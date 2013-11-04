@@ -2,8 +2,10 @@
 require 'spec_helper'
 describe APN::Notification do
 
+  let(:token) { "2589b1aa 363d23d8 d7f16695 1a9e3ff4 1fb0130a 637d6997 a2080d88 1b2a19b5" }
+  let(:payload) {"fake"}
   let(:notification) do
-    APN::Notification.new('token', payload)
+    APN::Notification.new(token, payload)
   end
 
   describe ".packaged_message" do
@@ -56,7 +58,29 @@ describe APN::Notification do
   end
 
   describe ".packaged_token" do
-    pending
+
+    context "when is a valid token" do
+
+      it "has 32 byte size" do
+        expect(notification.packaged_token.bytesize).to eq(32)
+      end
+    end
+
+    context "when token doesnt have spaces" do
+      let(:token) { "2589b1aa363d23d8d7f166951a9e3ff41fb0130a637d6997a2080d881b2a19b5" }
+
+      it "has 32 byte size" do
+        expect(notification.packaged_token.bytesize).to eq(32)
+      end
+    end
+
+    context "when token is more that 32 bytes" do
+      let(:token) { "9b1e2" * 50 }
+
+      it "raises" do
+        pending
+      end
+    end
   end
 
   describe ".truncate_alert!" do
