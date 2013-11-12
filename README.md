@@ -25,7 +25,7 @@ APN sender can use [Resque](http://github.com/defunkt/resque) or [Sidekiq](https
 
 ### 1. Use a background processor or not.
 
-You can either use Resque or Sidekiq, I strongly advice using Sidekiq, as apn_sender uses a connection pool for the apple socks. To use apn_snder with one of them you dont have to do anything, just include the background processor gem into your gemfile and it will all work. 
+You can either use Resque or Sidekiq, I strongly advice using Sidekiq, as apn_sender uses a connection pool for the apple socks. To use apn_sender with one of them you dont have to do anything, just include the background processor gem into your gemfile and it will all work. 
 
 ### 2. Queueing Messages From Your Application
 
