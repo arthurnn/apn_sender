@@ -28,20 +28,19 @@ module APN
     end
 
     def backend=(backend)
-      @backend = backend
+      @backend =
+        case backend
+        when Symbol
+          APN::Backend.const_get(backend.to_s.camelize).new
+        when nil
+          APN::Backend::Simple.new
+        else
+          backend
+        end
     end
 
     def backend
-      @backend ||=
-        if defined?(Sidekiq)
-          require 'apn/jobs/sidekiq_notification_job'
-          APN::Backend::Sidekiq.new
-        elsif defined?(Resque)
-          require 'apn/jobs/resque_notification_job'
-          APN::Backend::Resque.new
-        else
-          APN::Backend::Simple.new
-        end
+      @backend ||= APN::Backend::Simple.new
     end
 
     def logger=(logger)
