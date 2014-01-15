@@ -13,6 +13,7 @@ namespace :apn do
       return
     end
 
+    APN.backend = :resque
     APN.password = ENV['CERT_PASS']
     APN.full_certificate_path =  ENV['FULL_CERT_PATH']
     APN.logger = Rails.logger
