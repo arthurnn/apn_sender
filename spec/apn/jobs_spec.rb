@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 if defined? Sidekiq
+  require 'apn/backend/sidekiq'
   describe APN::Jobs::SidekiqNotificationJob do
 
     it { should be_a(Sidekiq::Worker) }
@@ -12,6 +13,7 @@ if defined? Sidekiq
 end
 
 if defined? Resque
+  require 'apn/backend/resque'
   describe APN::Jobs::ResqueNotificationJob do
 
     it "has the right queue name" do
