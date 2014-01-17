@@ -1,4 +1,11 @@
 # Version 2.0
+## 2.0.2
+- Add default file so we dont need to require 'apn' anymore
+- Change backend switch:
+  Use simple backend per default, also allow changes.
+  Now you can change the backend using:
+        APN.backend = :sidekiq
+
 ## 2.0.1
 - Use bytesize to truncate alert when necessary
 - Better calculation on payload size. (botvinik)
