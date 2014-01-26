@@ -22,6 +22,7 @@ module APN
       msg = APN::Notification.new(token, opts)
       raise "Invalid notification options (did you provide :alert, :badge, or :sound?): #{opts.inspect}" unless msg.valid?
 
+      APN.log(:debug, "Sending to token '#{token}' message '#{opts.to_s}'")
       APN.with_connection do |client|
         client.push(msg)
       end
