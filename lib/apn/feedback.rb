@@ -46,7 +46,7 @@ module APN
 
     # Prettify to return meaningful status information when printed. Can't add these directly to connection/base, because Resque depends on decoding to_s
     def to_s
-      "#{@socket ? 'Connected' : 'Connection not currently established'} to #{host} on #{port}"
+      "#{@client ? 'Connected' : 'Connection not currently established'} to #{host} on #{port}"
     end
 
     protected
