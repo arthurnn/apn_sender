@@ -56,9 +56,11 @@ APN.host = 'apple host (on development sandbox url is used by default)'
 APN.password = 'certificate_password'
 APN.pool_size = 1 # number of connections on the pool
 APN.pool_timeout = 5 # timeout in seconds for connection pool
+APN.logger = Logger.new(File.join(Rails.root, 'log', 'apn_sender.log'))
 ```
 
 Check ```logs/apn_sender.log``` for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.
+On latest versions apn_sender will use Rails.logger as the default logger.
 
 
 ### 4. Checking Apple's Feedback Service
