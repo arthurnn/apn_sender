@@ -22,7 +22,7 @@ module APN
 
       APN.log(:debug, "Message sent.")
       true
-    rescue OpenSSL::SSL::SSLError, Errno::EPIPE => e
+    rescue OpenSSL::SSL::SSLError, Errno::EPIPE, Errno::ETIMEDOUT => e
       APN.log(:error, "[##{self.object_id}] Exception occurred: #{e.inspect}, socket state: #{socket.inspect}")
       reset_socket
       APN.log(:debug, "[##{self.object_id}] Socket reestablished, socket state: #{socket.inspect}")
