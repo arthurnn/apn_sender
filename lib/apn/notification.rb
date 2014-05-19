@@ -73,6 +73,7 @@ module APN
           if sound = opts.delete(:sound)
             hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
           end
+          hsh['aps']['content-available'] = opts.delete('content-available').to_i if opts['content-available']
           hsh.merge!(opts)
           payload(hsh)
         end
