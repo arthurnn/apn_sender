@@ -52,6 +52,19 @@ describe APN::Notification do
       end
     end
 
+    [1, true].each do |v|
+      context "when content_available is #{v}" do
+        let(:payload) do
+          {content_available: v}
+        end
+
+        it "adds to the message" do
+          expect(message)
+            .to eq(ActiveSupport::JSON::encode(aps: {'content-available' => 1}))
+        end
+      end
+    end
+
     context "when payload is Localizable" do
       pending
     end
