@@ -21,7 +21,7 @@ module APN
     # Available to help clients determine before they create the notification if their message will be too large.
     # Each iPhone Notification payload must be 256 or fewer characters (not including the token or other push data), see Apple specs at:
     # https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4
-    DATA_MAX_BYTES = 256
+    DATA_MAX_BYTES = 255
 
     attr_accessor :options, :token
     def initialize(token, opts)
