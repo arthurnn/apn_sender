@@ -25,7 +25,7 @@ APN sender can use [Resque](http://github.com/defunkt/resque) or [Sidekiq](https
 
 ### 1. Use a background processor or not.
 
-You can either use Resque or Sidekiq, I strongly advice using Sidekiq, as apn_sender uses a connection pool for the apple socks. To use apn_sender with one of them you dont have to do anything, just include the background processor gem into your gemfile and it will all work. 
+You can either use Resque or Sidekiq, I strongly advice using Sidekiq, as apn_sender uses a connection pool for the apple socks. To use apn_sender with one of them you dont have to do anything, just include the background processor gem into your gemfile and it will all work.
 
 ### 2. Queueing Messages From Your Application
 
@@ -57,6 +57,7 @@ APN.password = 'certificate_password'
 APN.pool_size = 1 # number of connections on the pool
 APN.pool_timeout = 5 # timeout in seconds for connection pool
 APN.logger = Logger.new(File.join(Rails.root, 'log', 'apn_sender.log'))
+APN.truncate_alert = true # enable the truncation of the alert for notifications that exceed the max allowed bytes
 ```
 
 Check ```logs/apn_sender.log``` for debugging output.  In addition to logging any major errors there, apn_sender hooks into the Resque::Worker logging to display any verbose or very_verbose worker output in apn_sender.log file as well.

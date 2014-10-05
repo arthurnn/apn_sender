@@ -94,7 +94,7 @@ module APN
           end
           max_bytesize = DATA_MAX_BYTES - (str.bytesize - alert.bytesize)
 
-          raise "Even truncating the alert wont be enought to have a #{DATA_MAX_BYTES} message" if max_bytesize <= 0
+          raise "Even truncating the alert won't be enough to have a #{DATA_MAX_BYTES} message" if max_bytesize <= 0
           alert = truncate_alert(alert, max_bytesize)
 
           if hash['aps']['alert'].is_a?(Hash)
