@@ -73,6 +73,9 @@ module APN
           if sound = opts.delete(:sound)
             hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
           end
+          if category = opts.delete(:category)
+            hsh['aps']['category'] = category.to_s
+          end
           if content_available = opts.delete(:content_available)
             hsh['aps']['content-available'] = 1 if [1,true].include? content_available
           end
