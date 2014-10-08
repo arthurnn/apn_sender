@@ -58,7 +58,7 @@ module APN
     end
 
     # Converts the supplied options into the JSON needed for Apple's push notification servers.
-    # Extracts :alert, :badge, and :sound keys into the 'aps' hash, merges any other hash data
+    # Extracts :alert, :badge, :sound and :category keys into the 'aps' hash, merges any other hash data
     # into the root of the hash to encode and send to apple.
     def packaged_message
       @packaged_message ||=
@@ -70,11 +70,9 @@ module APN
             hsh['aps']['alert'] = alert
           end
           hsh['aps']['badge'] = opts.delete(:badge).to_i if opts[:badge]
+          hsh['aps']['category'] = opts.delete(:category).to_s if opts[:category]
           if sound = opts.delete(:sound)
             hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
-          end
-          if category = opts.delete(:category)
-            hsh['aps']['category'] = category.to_s
           end
           if content_available = opts.delete(:content_available)
             hsh['aps']['content-available'] = 1 if [1,true].include? content_available
