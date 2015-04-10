@@ -1,7 +1,7 @@
 require "openssl"
 require "socket"
+require "active_support"
 require "active_support/core_ext"
-require "active_support/json"
 require 'connection_pool'
 
 require "apn/version"
