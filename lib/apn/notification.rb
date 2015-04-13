@@ -1,3 +1,5 @@
+require 'apn/payload'
+
 module APN
   # Encapsulates the logic necessary to convert an iPhone token and an array of options into a string of the format required
   # by Apple's servers to send the notification.  Much of the processing code here copied with many thanks from
@@ -78,39 +80,8 @@ module APN
             hsh['aps']['content-available'] = 1 if [1,true].include? content_available
           end
           hsh.merge!(opts)
-          payload(hsh)
+          Payload.new(hsh, DATA_MAX_BYTES).package
         end
     end
-
-    private
-
-      def payload(hash)
-        str = ActiveSupport::JSON::encode(hash)
-
-        if APN.truncate_alert && str.bytesize > DATA_MAX_BYTES
-          if hash['aps']['alert'].is_a?(Hash)
-            alert = hash['aps']['alert']['loc-args'][0]
-          else
-            alert = hash['aps']['alert']
-          end
-          max_bytesize = DATA_MAX_BYTES - (str.bytesize - alert.bytesize)
-
-          raise "Even truncating the alert won't be enough to have a #{DATA_MAX_BYTES} message" if max_bytesize <= 0
-          alert = truncate_alert(alert, max_bytesize)
-
-          if hash['aps']['alert'].is_a?(Hash)
-            hash['aps']['alert']['loc-args'][0] = alert
-          else
-            hash['aps']['alert'] = alert
-          end
-          str = ActiveSupport::JSON::encode(hash)
-        end
-        str
-      end
-
-      def truncate_alert(alert, max_size)
-        alert.mb_chars.limit(max_size).to_s
-      end
-
   end
 end
