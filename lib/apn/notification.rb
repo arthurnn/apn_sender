@@ -109,13 +109,7 @@ module APN
       end
 
       def truncate_alert(alert, max_size)
-        alert.each_char.each_with_object('') do |char, result|
-          if result.bytesize + char.bytesize > max_size
-            break result
-          else
-            result << char
-          end
-        end
+        alert.mb_chars.limit(max_size).to_s
       end
 
   end
