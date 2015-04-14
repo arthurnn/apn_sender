@@ -32,4 +32,11 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
+task :console do
+  require 'pry'
+  require 'apn_sender'
+  ARGV.clear
+  Pry.start
+end
+
 task :default => :spec

@@ -142,8 +142,14 @@ describe APN::Notification do
         expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES - 1)
       end
 
-      it "has different payload size and message size" do
-        expect(notification.packaged_message.size.to_i).to_not eq(notification.payload_size)
+      if ActiveSupport::VERSION::MAJOR == 4
+        it "has different payload size and message size" do
+          expect(notification.packaged_message.size.to_i).to_not eq(notification.payload_size)
+        end
+      elsif ActiveSupport::VERSION::MAJOR == 3
+        it "has the same payload size and message size" do
+          expect(notification.packaged_message.size.to_i).to eq(notification.payload_size)
+        end
       end
     end
   end
