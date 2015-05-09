@@ -1,13 +1,14 @@
 require "openssl"
 require "socket"
-require "active_support/all"
+require "active_support"
+require "active_support/core_ext"
+require "active_support/json"
 require 'connection_pool'
 
 require "apn/version"
-require 'apn/connection'
+require "apn/connection"
 
 module APN
-
   class << self
     include APN::Connection
 
@@ -82,6 +83,7 @@ module APN
   end
 end
 
+require 'apn/multiple_apps' if ENV['APN_MULTIPLE_APPS'] == 'true'
 require 'apn/notification'
 require 'apn/client'
 require 'apn/feedback'
