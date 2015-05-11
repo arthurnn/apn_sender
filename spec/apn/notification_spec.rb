@@ -136,7 +136,7 @@ describe APN::Notification do
     end
 
     context "when payload is multibyte string" do
-      let(:payload) { "»" * 2047 }
+      let(:payload) { "»" * 2048 }
 
       it "truncates the alert in a way that no multibyte character gets truncated " do
         expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES - 1)
