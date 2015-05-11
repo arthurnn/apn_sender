@@ -117,7 +117,7 @@ describe APN::Notification do
       end
 
       it "has payload truncated only the alert" do
-        expect(notification.packaged_message).to eq({aps:{alert: "a" * 2028 }}.to_json)
+        expect(notification.packaged_message).to eq({aps:{alert: "a" * 2027 }}.to_json)
       end
     end
 
@@ -136,10 +136,10 @@ describe APN::Notification do
     end
 
     context "when payload is multibyte string" do
-      let(:payload) { "»" * 2048 }
+      let(:payload) { "»" * 2047 }
 
       it "truncates the alert in a way that no multibyte character gets truncated " do
-        expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES)
+        expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES - 1)
       end
 
       if ActiveSupport::VERSION::MAJOR == 4
