@@ -42,8 +42,8 @@ describe APN::Notification do
       end
     end
 
-    context "when payload is over 256 bytes" do
-      let(:payload) { "»" * 200 }
+    context "when payload is over 2048 bytes" do
+      let(:payload) { "»" * 3000 }
 
       it "raises" do
         expect {
@@ -106,7 +106,7 @@ describe APN::Notification do
     end
 
     context "when alert is a string" do
-      let(:payload) { "a" * 300 }
+      let(:payload) { "a" * 5000 }
 
       it "truncates the alert" do
         expect(notification.packaged_message.size.to_i).to eq(APN::Notification::DATA_MAX_BYTES)
@@ -117,13 +117,13 @@ describe APN::Notification do
       end
 
       it "has payload truncated only the alert" do
-        expect(notification.packaged_message).to eq({aps:{alert: "a" * 235 }}.to_json)
+        expect(notification.packaged_message).to eq({aps:{alert: "a" * 2028 }}.to_json)
       end
     end
 
     context "when payload is a hash" do
       let(:payload) do
-        { alert: { 'loc-args' => ["a" * 300] }}
+        { alert: { 'loc-args' => ["a" * 3000] }}
       end
 
       it "truncates the alert" do
@@ -136,10 +136,10 @@ describe APN::Notification do
     end
 
     context "when payload is multibyte string" do
-      let(:payload) { "»" * 256 }
+      let(:payload) { "ß" * 3000 }
 
       it "truncates the alert in a way that no multibyte character gets truncated " do
-        expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES - 1)
+        expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES)
       end
 
       if ActiveSupport::VERSION::MAJOR == 4
