@@ -43,7 +43,7 @@ describe APN::Notification do
     end
 
     context "when payload is over 2048 bytes" do
-      let(:payload) { "»" * 3000 }
+      let(:payload) { "»" * 2049 }
 
       it "raises" do
         expect {
@@ -106,7 +106,7 @@ describe APN::Notification do
     end
 
     context "when alert is a string" do
-      let(:payload) { "a" * 5000 }
+      let(:payload) { "a" * 2049 }
 
       it "truncates the alert" do
         expect(notification.packaged_message.size.to_i).to eq(APN::Notification::DATA_MAX_BYTES)
@@ -123,7 +123,7 @@ describe APN::Notification do
 
     context "when payload is a hash" do
       let(:payload) do
-        { alert: { 'loc-args' => ["a" * 3000] }}
+        { alert: { 'loc-args' => ["a" * 2049] }}
       end
 
       it "truncates the alert" do
@@ -136,7 +136,7 @@ describe APN::Notification do
     end
 
     context "when payload is multibyte string" do
-      let(:payload) { "ß" * 3000 }
+      let(:payload) { "»" * 2048 }
 
       it "truncates the alert in a way that no multibyte character gets truncated " do
         expect(notification.payload_size).to eq(APN::Notification::DATA_MAX_BYTES)
