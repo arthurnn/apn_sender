@@ -15,15 +15,13 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/arthurnn/apn_sender"
   s.license = "MIT"
 
+  s.files = Dir["lib/**/*"]
+  s.require_paths = ['lib']
+
   s.required_ruby_version     = ">= 1.9"
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.add_dependency("connection_pool", [">= 0"])
-  s.add_dependency("activesupport", [">= 3.1", "< 5.0.0"])
-  s.add_dependency("daemons")
-
-  s.add_development_dependency "pry"
-
-  s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
-  s.require_path = 'lib'
+  s.add_dependency "connection_pool"
+  s.add_dependency "activesupport", ">= 3.1", "< 5"
+  s.add_dependency "daemons"
 end
