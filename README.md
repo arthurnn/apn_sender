@@ -40,6 +40,7 @@ Where ```token``` is the unique identifier of the iPhone to receive the notifica
 * :alert  ## The alert to send
 * :badge  ## The badge number to send
 * :sound  ## The sound file to play on receipt, or true to play the default sound installed with your app
+* :content_available ## Lets the remote notification act as a ["silent" notification](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ApplePushService.html).
 
 If any other keys are present they'll be be passed along as custom data to your application.
 
