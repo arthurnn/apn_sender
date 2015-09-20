@@ -21,8 +21,8 @@ module APN
   #
   class Notification
     # Available to help clients determine before they create the notification if their message will be too large.
-    # Each iPhone Notification payload must be 256 or fewer characters (not including the token or other push data), see Apple specs at:
-    # https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4
+    # Each iPhone Notification payload must be 2047 or fewer characters (not including the token or other push data), see Apple specs at:
+    # https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1
     DATA_MAX_BYTES = 2047
 
     attr_accessor :options, :token
@@ -49,9 +49,23 @@ module APN
 
     # Completed encoded notification, ready to send down the wire to Apple
     def packaged_notification
-      pt = packaged_token
-      pm = packaged_message
-      [0, 0, 32, pt, 0, payload_size, pm].pack("ccca*cca*")
+      [2, frame_length, packaged_frame].pack("cl>a*")
+    end
+
+    def frame_length
+      packaged_frame.bytesize
+    end
+
+    def packaged_frame
+      [token_frame, payload_frame].pack('a*a*')
+    end
+
+    def token_frame
+      [1, 32, packaged_token].pack('cs>a*')
+    end
+
+    def payload_frame
+      [2, payload_size, packaged_message].pack('cs>a*')
     end
 
     # Device token, compressed and hex-ified
