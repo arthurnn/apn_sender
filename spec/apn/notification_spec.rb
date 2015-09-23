@@ -96,6 +96,23 @@ describe APN::Notification do
     end
   end
 
+  describe ".packaged_notification" do
+    it 'has the correct size' do
+      size = 1 + # command
+             4 + # frame_length
+             35 + # token_frame
+             27 # payload_frame
+      expect(notification.packaged_notification.bytesize).to eq(size)
+    end
+
+    it 'has the correct format' do
+      packaged = "\x02\x00\x00\x00\x3e" +
+        "\x01\x00\x20#{notification.packaged_token}" +
+        "\x02\x00\x18#{notification.packaged_message}"
+      expect(notification.packaged_notification).to eq(packaged)
+    end
+  end
+
   describe ".truncate_alert!" do
 
     before do
