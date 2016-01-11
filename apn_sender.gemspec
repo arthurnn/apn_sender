@@ -8,7 +8,6 @@ Gem::Specification.new do |s|
   s.name = %q{apn_sender}
   s.version = APN::VERSION
   s.authors = ["Kali Donovan", "Arthur Neves"]
-  s.date = %q{2011-05-15}
   s.summary = "Background worker to send Apple Push Notifications over a persistent TCP socket."
   s.description = "Background worker to send Apple Push Notifications over a persistent TCP socket. Includes Resque tweaks to allow persistent sockets between jobs, helper methods for enqueueing APN notifications, and a background daemon to send them."
   s.email = %q{arthurnn@gmail.com}
