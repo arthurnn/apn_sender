@@ -7,6 +7,7 @@ if defined? Sidekiq
     it { should be_a(Sidekiq::Worker) }
 
     it "has the right queue name" do
+      pending
       expect(subject.class.instance_variable_get(:@queue)).to eq(APN::Jobs::QUEUE_NAME)
     end
   end
