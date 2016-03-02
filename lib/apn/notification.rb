@@ -41,9 +41,9 @@ module APN
       packaged_message.bytesize
     end
 
-    # Ensures at least one of <code>%w(alert badge sound)</code> is present
+    # Ensures at least one of <code>%w(alert badge sound content_available)</code> is present
     def valid?
-      return true if [:alert, :badge, :sound].any?{|key| options.keys.include?(key) }
+      return true if [:alert, :badge, :sound, :content_available].any?{|key| options.keys.include?(key) }
       false
     end
 
