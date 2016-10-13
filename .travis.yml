@@ -13,3 +13,18 @@ gemfile:
   - Gemfile
   - Gemfile.sidekiq
   - Gemfile.resque
+matrix:
+  exclude:
+    - rvm: 1.9.3
+      gemfile: Gemfile.sidekiq
+    - rvm: 2.0.0
+      gemfile: Gemfile.sidekiq
+    - rvm: 2.1
+      gemfile: Gemfile.sidekiq
+  include:
+    - rvm: 1.9.3
+      gemfile: Gemfile.sidekiq.3.1
+    - rvm: 2.0.0
+      gemfile: Gemfile.sidekiq.3
+    - rvm: 2.1
+      gemfile: Gemfile.sidekiq.3
