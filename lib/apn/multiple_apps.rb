@@ -1,10 +1,23 @@
 require "apn/application"
 
+module APNSupportingMultipleApps
+  def notify_sync(token, notification)
+    if notification.is_a?(Hash)
+      notification.symbolize_keys!
+      app_name = notification.delete(:app)
+    end
+
+    with_app(app_name) do
+      super(token, notification)
+    end
+  end
+end
+
 module APN
   module MultipleApps
     def self.extended(mod)
       class << mod
-        alias_method_chain :notify_sync, :app
+        prepend APNSupportingMultipleApps
 
         delegate(*Application::DELEGATE_METHODS, to: :current_app, prefix: true, allow_nil: true)
 
@@ -12,17 +25,6 @@ module APN
           alias_method :"original_#{method_name}", method_name
           alias_method method_name, :"current_app_#{method_name}"
         end
-      end
-    end
-
-    def notify_sync_with_app(token, notification)
-      if notification.is_a?(Hash)
-        notification.symbolize_keys!
-        app_name = notification.delete(:app)
-      end
-
-      with_app(app_name) do
-        notify_sync_without_app(token, notification)
       end
     end
 
